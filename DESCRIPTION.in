@@ -1,0 +1,17 @@
+Package: polychoric
+Type: Package
+Title: Fast Polychoric Correlation for Vectors and Data Frames
+Version: 0.9
+Date: 2023-05-30
+Author: Andrej Pawluczenko
+Maintainer: Andrej Pawluczenko <a.pawluczenko@gmail.com>
+Description: A wrapper for C++ routines for calculating polychoric correlation coefficients often used in social science or marketing research. Single function `polycorr()` can take in ordinal factor (possibly integer) vectors, a contingency table or a data frame. It returns corresponding polychoric correlation estimates in a form of single numeric value or correlation matrix.
+License: MIT + file LICENSE
+Suggests: tinytest
+Encoding: UTF-8
+RoxygenNote: 7.2.3
+Imports: 
+    Rcpp
+LinkingTo: Rcpp, RcppEigen
+URL: https://github.com/Marwolaeth/polychoric
+BugReports: https://github.com/Marwolaeth/polychoric/issues

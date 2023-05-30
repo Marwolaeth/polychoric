@@ -65,7 +65,7 @@ bm <- microbenchmark(
 )
 bm
 
-## GSS 2012 Cultural Module
+## GSS 2012 CULTURE MODULE ----
 data("gss12_values", package = 'polychoric')
 
 # A pair of discrete vectors
@@ -83,3 +83,6 @@ polycorr(gss12_values)
 # is presumably continuous (n_distinct(x) > 10 | n_distinct(y) > 10)
 x <- rnorm(nrow(gss12_values))
 polycorr(gss12_values$valspl, x)
+
+## HELP DOCUMENTATION ----
+?polycorr #Why???

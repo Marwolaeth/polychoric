@@ -11,14 +11,7 @@ library(devtools)
 package_info()
 packageVersion("devtools")
 packageVersion("roxygen2")
-# library(RcppEigen)
-# 
-use_rcpp_eigen()
-use_package("RcppEigen")
-document()
-# Rcpp::compileAttributes()
-# 
-#
+
 use_git()
 use_github()
 # 
@@ -32,3 +25,6 @@ load_all()
 check(document = TRUE, remote = TRUE)
 
 use_mit_license()
+
+document()
+use_rcpp_eigen()

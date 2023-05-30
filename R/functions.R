@@ -1,15 +1,26 @@
 #' Estimate polychoric correlation coefficients
 #'
 #' @param x A vector of discrete scores: ordinal or integer, a contingency table or a data.frame (or a tibble) of discrete scores.
-#' @param y A vector of discrete scores: ordinal or integer; only used when x is a vector.
-#' @param correct Correction value to use to correct for continuity in the case of zero entry cell of a contingency table. Can be used with any x input type.
-#' @param coef.only If TRUE, returns only correlation coefficients (see Value).
+#' @param y A vector of discrete scores: ordinal or integer; only used when `x` is a vector.
+#' @param correct Correction value to use to correct for continuity in the case of zero entry cell of a contingency table. Can be used with any `x` input type.
+#' @param coef.only If `TRUE`, returns only correlation coefficients (see Value).
 #'
-#' @return Polychoric correlation coefficients: numeric of length one (for a pair of vectors or a contingency table) or an m×m correlation matrix (if x is a data.frame), where m is the number of items in the dataset. coef.only=FALSE, returns a list with (a matrix of) coefficients, a list of threshold estimates for every item used (length two for a pair of vectors or a table, length m for a data.frame) and (a matrix of) p-values of correlation coefficients.
+#' @return Polychoric correlation coefficients: numeric of length one (for a pair of vectors or a contingency table) or an m×m correlation matrix (if `x` is a data.frame), where m is the number of items in the dataset. `coef.only=FALSE`, returns a list with (a matrix of) coefficients, a list of threshold estimates for every item used (length two for a pair of vectors or a table, length m for a data.frame) and (a matrix of) p-values of correlation coefficients.
 #' @export
 #'
 #' @details
+#' Polychoric correlation coefficients are a type of correlation coefficient used to measure the relationship between two ordinal variables. They are computed by estimating the correlation between two underlying continuous variables that are assumed to give rise to the observed ordinal data. This function currently only estimates latent Pearson correlation coefficients under the assumption that the latent threats of interest are standard normal random variables.
 #' 
+#' The computation of polychoric correlation coefficients involves estimating the thresholds (here called ‘gamma’ and ‘tau’, like in Drasgow 1986, or just `tau` as in `psych` package (Revelle 2023)) that separate the ordinal categories for each variable. These thresholds are used to transform the ordinal data into a set of continuous variables, which can then be used to estimate the correlation coefficient using standard methods.
+#' 
+#' There are several methods for computing polychoric correlation coefficients, including maximum likelihood estimation and Bayesian estimation. These methods involve different assumptions about the distribution of the underlying continuous variables and the relationship between them. This package currently only uses a two-step maximum likelihood estimation, where first the thresholds are deduced from univariate distributions of ordinal variables and then optimisation algorithm L-BFGS-B is used to find the value of the correlation coefficient `$\rho$` that maximises the likelihood of the observed contingency table.
+#' 
+#' Polychoric correlation coefficients are useful for analyzing data that involve ordinal variables, such as Likert scales or survey responses. They provide a measure of the strength and direction of the relationship between two ordinal variables, which can be useful for understanding patterns in the data and making predictions about future observations.
+#'
+#' @references Drasgow, Fritz (1986). Polychoric and polyserial correlations. The Encyclopedia of Statistics. 7. 68-74.
+#' @references Revelle, William (2023). _psych: Procedures for Psychological, Psychometric, and Personality Research_. Northwestern University, Evanston, Illinois. R package version 2.3.3, <https://CRAN.R-project.org/package=psych>.
+#' @references Olsson, U (1979). Maximum Likelihood Estimation of the Polychoric Correlation Coefficient, Psychometrika, 44:443-460.
+#' @references Qiu, Yixuan (2023). LBFGS++: A Header-only C++ Library for L-BFGS and L-BFGS-B Algorithms. Available at: https://lbfgspp.statr.me/
 #'
 #' @examples
 #' ## GSS 2012 Cultural Module

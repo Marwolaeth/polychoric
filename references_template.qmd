@@ -1,0 +1,46 @@
+---
+title: "References Template"
+author: "polychoric"
+format: html
+---
+
+@article{article,
+author = {Drasgow, Fritz},
+year = {1986},
+month = {01},
+pages = {68-74},
+title = {Polychoric and polyserial correlations},
+volume = {7},
+journal = {The Encyclopedia of Statistics}
+}
+
+Olsson, U. Maximum likelihood estimation of the polychoric correlation coefficient. Psychometrika 44, 443–460 (1979). https://doi.org/10.1007/BF02296207
+
+Rigdon, E. E., & Ferguson, C. E. (1991). The Performance of the Polychoric Correlation Coefficient and Selected Fitting Functions in Confirmatory Factor Analysis with Ordinal Data. Journal of Marketing Research, 28(4), 491–497. https://doi.org/10.1177/002224379102800412
+
+The Personality Project's Guide to R
+The Personality Project's Guide to R (2023). Available at: http://personality-project.org/r/psych/ (Accessed: 30 May 2023).
+
+toms462
+toms462 (2023). Available at: https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html (Accessed: 30 May 2023).
+
+Thomas Donnelly,
+Algorithm 462: Bivariate Normal Distribution,
+Communications of the ACM,
+October 1973, Volume 16, Number 10, page 638.
+
+Donald Owen,
+Tables for Computing Bivariate Normal Probabilities,
+Annals of Mathematical Statistics,
+Volume 27, Number 4, pages 1075-1090, December 1956.
+
+@MISC{eigenweb,
+  author = {Ga\"{e}l Guennebaud and Beno\^{i}t Jacob and others},
+  title = {Eigen v3},
+  howpublished = {http://eigen.tuxfamily.org},
+  year = {2010}
+ }
+
+LBFGS++: A Header-only C++ Library for L-BFGS and L-BFGS-B Algorithms
+LBFGS++: A Header-only C++ Library for L-BFGS and L-BFGS-B Algorithms (2023). Available at: https://lbfgspp.statr.me/ (Accessed: 30 May 2023).
+
