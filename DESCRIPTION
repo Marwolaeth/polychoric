@@ -13,3 +13,5 @@ RoxygenNote: 7.2.3
 Imports: 
     Rcpp
 LinkingTo: Rcpp, RcppEigen
+URL: https://github.com/Marwolaeth/polychoric
+BugReports: https://github.com/Marwolaeth/polychoric/issues
