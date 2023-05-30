@@ -1,3 +1,6 @@
+# This file is used to construct the package
+# It is not a part of `polychoric` package
+
 required_packages <- c(
   'roxygen2',
   'pkgdown'
