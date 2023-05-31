@@ -96,7 +96,7 @@ double cor_spearman(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
   double rho;
   // check for equal length
   if (y.size() != n) {
-    throw std::invalid_argument("Vectors are of different dimensionality");
+    Rcpp::stop("Vectors are of different dimensionality");
   }
   d = rank_vec(x).array() - rank_vec(y).array();
   rho = 1.0 - (6.0 * (d.dot(d))) / (n*(n*n - 1));
@@ -124,7 +124,7 @@ double Phi(double x, double e = 0.0, double s = 1.0) {
 double Phi_inv(double p, double e = 0.0, double s = 1.0) {
   // check for valid input probability
   if (p < 0.0 || p > 1.0) {
-    throw std::invalid_argument("Invalid input probability");
+    Rcpp::stop("Invalid input probability");
   }
   // initial guess for inverse CDF value
   double z = 0.0;
@@ -149,7 +149,7 @@ Eigen::VectorXd Phi_inv_vec(
 ) {
   // check for valid input standard deviations
   if (s <= 0) {
-    throw std::invalid_argument("Standard deviation must be positive");
+    Rcpp::stop("Standard deviation must be positive");
   }
   int n = p.size();
   Eigen::VectorXd x(n);
@@ -170,7 +170,7 @@ double phi2(
 ) {
   double pi = std::atan(1) * 4; // calculate pi
   if (s1 <= 0 || s2 <= 0) {
-    throw std::invalid_argument("Standard deviation must be positive");
+    Rcpp::stop("Standard deviation must be positive");
   }
   double z1 = (x - e1) / s1; // calculate standardized value of x
   double z2 = (y - e2) / s2; // calculate standardized value of y
@@ -191,7 +191,7 @@ double Phi2(
 ) {
   double pi = std::atan(1) * 4; // calculate pi
   if (s1 <= 0 || s2 <= 0) {
-    throw std::invalid_argument("Standard deviation must be positive");
+    Rcpp::stop("Standard deviation must be positive");
   }
   double z1 = (x - e1) / s1; // calculate standardized value of x
   double z2 = (y - e2) / s2; // calculate standardized value of y
@@ -213,7 +213,7 @@ Eigen::MatrixXd grid_discretised_normal_pmf(
   int n = X.size();
   int m = Y.size();
   if (s1 <= 0 || s2 <= 0) {
-    throw std::invalid_argument("Standard deviation must be positive");
+    Rcpp::stop("Standard deviation must be positive");
   }
   // append large values to X and Y
   Eigen::VectorXd Xa(n+1);
@@ -268,7 +268,7 @@ double contingency_table_loglik(const Eigen::MatrixXd& G, const Eigen::MatrixXd&
   int r = G.rows();
   int s = G.cols();
   if (r != P.rows() || s != P.cols()) {
-    throw std::invalid_argument("Input matrices must have same dimensions");
+    Rcpp::stop("Input matrices must have same dimensions");
   }
   double loglik = 0.0;
   for (int i = 0; i < r; i++) {
