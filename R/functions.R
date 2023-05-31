@@ -42,7 +42,7 @@
 polycorr <- function(x, y = NULL, correct = 0.1, coef.only = TRUE) {
   x <- na.omit(x)
   if (!is.null(y)) {
-    y <- na.omit(y)
+    y <- stats::na.omit(y)
     if (coef.only) {
       return(.poly_xy(x, y, correct = correct))
     } else {

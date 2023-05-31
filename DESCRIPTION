@@ -15,3 +15,6 @@ Imports:
 LinkingTo: Rcpp, RcppEigen
 URL: https://github.com/Marwolaeth/polychoric
 BugReports: https://github.com/Marwolaeth/polychoric/issues
+Depends: 
+    R (>= 4.10)
+LazyData: true
