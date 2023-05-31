@@ -5,7 +5,7 @@
 #define LBFGSPP_LBFGSB_H
 
 #include <vector>
-#include <Eigen/Core>
+// #include <Eigen/Core>
 #include <Rcpp.h>
 #include <RcppEigen.h>
 // [[Rcpp::depends(RcppEigen)]]

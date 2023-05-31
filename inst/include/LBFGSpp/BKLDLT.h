@@ -6,7 +6,9 @@
 
 #include <vector>
 #include <Rcpp.h>
-#include <Eigen/Core>
+// #include <Eigen/Core>
+#include <RcppEigen.h>
+// [[Rcpp::depends(RcppEigen)]]
 
 /// \cond
 

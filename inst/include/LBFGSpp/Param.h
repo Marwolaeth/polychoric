@@ -4,8 +4,10 @@
 #ifndef LBFGSPP_PARAM_H
 #define LBFGSPP_PARAM_H
 
-#include <Eigen/Core>
+// #include <Eigen/Core>
 #include <Rcpp.h>
+#include <RcppEigen.h>
+// [[Rcpp::depends(RcppEigen)]]
 
 namespace LBFGSpp {
 

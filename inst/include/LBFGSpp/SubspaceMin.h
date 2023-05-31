@@ -6,7 +6,9 @@
 
 #include <stdexcept>
 #include <vector>
-#include <Eigen/Core>
+// #include <Eigen/Core>
+#include <RcppEigen.h>
+// [[Rcpp::depends(RcppEigen)]]
 #include "BFGSMat.h"
 
 /// \cond

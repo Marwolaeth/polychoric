@@ -4,8 +4,10 @@
 #ifndef LBFGSPP_LINE_SEARCH_MORE_THUENTE_H
 #define LBFGSPP_LINE_SEARCH_MORE_THUENTE_H
 
-#include <Eigen/Core>
+// #include <Eigen/Core>
 #include <Rcpp.h>
+#include <RcppEigen.h>
+// [[Rcpp::depends(RcppEigen)]]
 #include "LBFGSpp/Param.h"
 
 namespace LBFGSpp {
