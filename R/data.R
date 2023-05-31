@@ -4,9 +4,9 @@
 #' 
 #' The items are 6-level Likert scale from “Not like me at all” to “Very much like me”. Each question describes a person who adheres to certain values, the respondent is asked to what extent that person is like him.
 #' 
-#' *Module instruction:* “Now I will briefly describe some people. Please listen to each description and tell me how much each person is or is not like you. Use this card for your answer.”
+#' Module instruction: “Now I will briefly describe some people. Please listen to each description and tell me how much each person is or is not like you. Use this card for your answer.”
 #' 
-#' *Possible responses:*
+#' Possible responses:
 #' 1.	Not like me at all
 #' 2.	Not like me
 #' 3.	A little like me
@@ -14,8 +14,11 @@
 #' 5.	Like me
 #' 6.	Very much like me
 #'
-#' @format ## `gss12_values`
+#' @format
+#' 
+#' ## `gss12_values`:
 #' A tibble with 1,255 rows and 21 columns:
+#' 
 #' \describe{
 #'  \item{valorig}{“Doing things in original ways is important”: Thinking up new ideas and being creative is important to (her/him). (S/he) likes to do things in (her/his) own original way.}
 #'  \item{valrich}{“Getting rich is important”: It is important to (her/him) to be rich. (S/he) wants to have a lot of money and expensive things.}

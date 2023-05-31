@@ -80,3 +80,7 @@ polycorr(gss12_values)
 # is presumably continuous (n_distinct(x) > 10 | n_distinct(y) > 10)
 x <- rnorm(nrow(gss12_values))
 polycorr(gss12_values$valspl, x)
+
+## IN LIBRARY ----
+library(polychoric)
+?polycorr

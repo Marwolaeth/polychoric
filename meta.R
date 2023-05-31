@@ -21,3 +21,5 @@ check(document = TRUE, remote = TRUE, cran = TRUE)
 
 use_readme_rmd()
 build_readme()
+
+install()
