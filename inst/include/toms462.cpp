@@ -1,6 +1,6 @@
 # include <cmath>
 
-using namespace std;
+// using namespace std;
 
 # include "toms462.hpp"
 
@@ -244,8 +244,8 @@ double bivnor ( double ah, double ak, double r )
   if ( r == 0.0 )
   {
     b = 4.00 * gh * gk;
-    b = fmax ( b, 0.0 );
-    b = fmin ( b, 1.0 );
+    b = std::fmax ( b, 0.0 );
+    b = std::fmin ( b, 1.0 );
     return b;
   }
 
@@ -276,12 +276,12 @@ double bivnor ( double ah, double ak, double r )
         b = 2.0 * gh;
       }
     }
-    b = fmax ( b, 0.0 );
-    b = fmin ( b, 1.0 );
+    b = std::fmax ( b, 0.0 );
+    b = std::fmin ( b, 1.0 );
     return b;
   }
 
-  sqr = sqrt ( rr );
+  sqr = std::sqrt ( rr );
 
   if ( idig == 15 )
   {
@@ -300,9 +300,9 @@ double bivnor ( double ah, double ak, double r )
 //
   if ( ah == 0.0 && ak == 0.0 )
   {
-    b = 0.25 + asin ( r ) / twopi;
-    b = fmax ( b, 0.0 );
-    b = fmin ( b, 1.0 );
+    b = 0.25 + std::asin ( r ) / twopi;
+    b = std::fmax ( b, 0.0 );
+    b = std::fmin ( b, 1.0 );
     return b;
   }
 //
@@ -350,14 +350,14 @@ double bivnor ( double ah, double ak, double r )
 
     if ( wk != 0.0 )
     {
-      if ( fabs ( wk ) == 1.0 )
+      if ( std::fabs ( wk ) == 1.0 )
       {
         t = wk * gw * ( 1.0 - gw ) / 2.0;
         b = b + sgn * t;
       }
       else
       {
-        if ( 1.0 < fabs ( wk ) )
+        if ( 1.0 < std::fabs ( wk ) )
         {
           sgn = -sgn;
           wh = wh * wk;
@@ -373,21 +373,21 @@ double bivnor ( double ah, double ak, double r )
         h2 = wh * wh;
         a2 = wk * wk;
         h4 = h2 / 2.0;
-        ex = exp ( - h4 );
+        ex = std::exp ( - h4 );
         w2 = h4 * ex;
         ap = 1.0;
         s2 = ap - ex;
         sp = ap;
         s1 = 0.0;
         sn = s1;
-        conex = fabs ( con / wk );
+        conex = std::fabs ( con / wk );
 
         for ( ; ; )
         {
           cn = ap * s2 / ( sn + sp );
           s1 = s1 + cn;
 
-          if ( fabs ( cn ) <= conex )
+          if ( std::fabs ( cn ) <= conex )
           {
             break;
           }
@@ -397,7 +397,7 @@ double bivnor ( double ah, double ak, double r )
           w2 = w2 * h4 / sp;
           ap = - ap * a2;
         }
-        t = ( atan ( wk ) - wk * s1 ) / twopi;
+        t = ( std::atan ( wk ) - wk * s1 ) / twopi;
         b = b + sgn * t;
       }
     }
@@ -415,8 +415,8 @@ double bivnor ( double ah, double ak, double r )
     is = 1;
   }
 
-  b = fmax ( b, 0.0 );
-  b = fmin ( b, 1.0 );
+  b = std::fmax ( b, 0.0 );
+  b = std::fmin ( b, 1.0 );
 
   return b;
 }
@@ -451,7 +451,7 @@ double gauss ( double t )
 {
   double value;
 
-  value = ( 1.0 + erf ( t / sqrt ( 2.0 ) ) ) / 2.0;
+  value = ( 1.0 + std::erf ( t / std::sqrt ( 2.0 ) ) ) / 2.0;
 
   return value;
 }

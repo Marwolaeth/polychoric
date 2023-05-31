@@ -245,11 +245,6 @@ public:
             iu = brk[ord[b]];
             // Width of the current interval
             deltat = iu - il;
-
-            /* iter++;
-            std::cout << "** Iter " << iter << " **\n";
-            std::cout << "   fp = " << fp << ", fpp = " << fpp << ", deltatmin = " << deltatmin << std::endl;
-            std::cout << "   il = " << il << ", iu = " << iu << ", deltat = " << deltat << std::endl; */
         }
 
         // In some rare cases fpp is numerically zero, making deltatmin equal to Inf

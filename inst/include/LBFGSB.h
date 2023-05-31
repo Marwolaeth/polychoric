@@ -238,9 +238,7 @@ public:
 
             /*Vector gcp(n);
             Scalar fcp = f(xcp, gcp);
-            Scalar projgcpnorm = proj_grad_norm(xcp, gcp, lb, ub);
-            std::cout << "xcp = " << xcp.transpose() << std::endl;
-            std::cout << "f(xcp) = " << fcp << ", ||proj_grad|| = " << projgcpnorm << std::endl << std::endl;*/
+            Scalar projgcpnorm = proj_grad_norm(xcp, gcp, lb, ub);*/
 
             SubspaceMin<Scalar>::subspace_minimize(m_bfgs, x, xcp, m_grad, lb, ub,
                                                    vecc, newact_set, fv_set, m_param.max_submin, m_drt);
