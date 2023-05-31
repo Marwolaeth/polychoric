@@ -188,8 +188,8 @@ double Phi_inv(double p, double e = 0.0, double s = 1.0) {
 
 Eigen::VectorXd Phi_inv_vec(
     const Eigen::VectorXd& p,
-    double mu = 0.0,
-    double sd = 1.0
+    double e = 0.0,
+    double s = 1.0
 ) {
   // check for valid input standard deviations
   // if (s <= 0) {
@@ -198,7 +198,7 @@ Eigen::VectorXd Phi_inv_vec(
   int n = p.size();
   Eigen::VectorXd x(n);
   for (int i = 0; i < n; i++) {
-    x(i) = Phi_inv(p(i), e = mu, s = sd);
+    x(i) = Phi_inv(p(i), e, s);
   }
   return x;
 }
