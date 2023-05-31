@@ -19,7 +19,7 @@ check(document = TRUE, remote = TRUE, cran = TRUE)
 
 # use_data(gss12_values)
 
-use_readme_rmd()
-build_readme()
+# use_readme_rmd()
+# build_readme()
 
 install()
