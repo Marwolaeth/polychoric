@@ -256,9 +256,6 @@ double bivnor ( double ah, double ak, double r )
 
   if ( rr < 0.0 )
   {
-    // cerr << "\n";
-    // cerr << "BIVNOR - Fatal error!\n";
-    // cerr << "  1 < |R|.\n";
     return 0.0;
   }
 

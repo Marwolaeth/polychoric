@@ -5,7 +5,7 @@
 #define LBFGSPP_PARAM_H
 
 #include <Eigen/Core>
-#include <stdexcept>  // std::invalid_argument
+#include <Rcpp.h>
 
 namespace LBFGSpp {
 
@@ -191,30 +191,30 @@ public:
     inline void check_param() const
     {
         if (m <= 0)
-            throw std::invalid_argument("'m' must be positive");
+            Rcpp::stop("'m' must be positive");
         if (epsilon < 0)
-            throw std::invalid_argument("'epsilon' must be non-negative");
+            Rcpp::stop("'epsilon' must be non-negative");
         if (epsilon_rel < 0)
-            throw std::invalid_argument("'epsilon_rel' must be non-negative");
+            Rcpp::stop("'epsilon_rel' must be non-negative");
         if (past < 0)
-            throw std::invalid_argument("'past' must be non-negative");
+            Rcpp::stop("'past' must be non-negative");
         if (delta < 0)
-            throw std::invalid_argument("'delta' must be non-negative");
+            Rcpp::stop("'delta' must be non-negative");
         if (max_iterations < 0)
-            throw std::invalid_argument("'max_iterations' must be non-negative");
+            Rcpp::stop("'max_iterations' must be non-negative");
         if (linesearch < LBFGS_LINESEARCH_BACKTRACKING_ARMIJO ||
             linesearch > LBFGS_LINESEARCH_BACKTRACKING_STRONG_WOLFE)
-            throw std::invalid_argument("unsupported line search termination condition");
+            Rcpp::stop("unsupported line search termination condition");
         if (max_linesearch <= 0)
-            throw std::invalid_argument("'max_linesearch' must be positive");
+            Rcpp::stop("'max_linesearch' must be positive");
         if (min_step < 0)
-            throw std::invalid_argument("'min_step' must be positive");
+            Rcpp::stop("'min_step' must be positive");
         if (max_step < min_step)
-            throw std::invalid_argument("'max_step' must be greater than 'min_step'");
+            Rcpp::stop("'max_step' must be greater than 'min_step'");
         if (ftol <= 0 || ftol >= 0.5)
-            throw std::invalid_argument("'ftol' must satisfy 0 < ftol < 0.5");
+            Rcpp::stop("'ftol' must satisfy 0 < ftol < 0.5");
         if (wolfe <= ftol || wolfe >= 1)
-            throw std::invalid_argument("'wolfe' must satisfy ftol < wolfe < 1");
+            Rcpp::stop("'wolfe' must satisfy ftol < wolfe < 1");
     }
 };
 
@@ -350,29 +350,29 @@ public:
     inline void check_param() const
     {
         if (m <= 0)
-            throw std::invalid_argument("'m' must be positive");
+            Rcpp::stop("'m' must be positive");
         if (epsilon < 0)
-            throw std::invalid_argument("'epsilon' must be non-negative");
+            Rcpp::stop("'epsilon' must be non-negative");
         if (epsilon_rel < 0)
-            throw std::invalid_argument("'epsilon_rel' must be non-negative");
+            Rcpp::stop("'epsilon_rel' must be non-negative");
         if (past < 0)
-            throw std::invalid_argument("'past' must be non-negative");
+            Rcpp::stop("'past' must be non-negative");
         if (delta < 0)
-            throw std::invalid_argument("'delta' must be non-negative");
+            Rcpp::stop("'delta' must be non-negative");
         if (max_iterations < 0)
-            throw std::invalid_argument("'max_iterations' must be non-negative");
+            Rcpp::stop("'max_iterations' must be non-negative");
         if (max_submin < 0)
-            throw std::invalid_argument("'max_submin' must be non-negative");
+            Rcpp::stop("'max_submin' must be non-negative");
         if (max_linesearch <= 0)
-            throw std::invalid_argument("'max_linesearch' must be positive");
+            Rcpp::stop("'max_linesearch' must be positive");
         if (min_step < 0)
-            throw std::invalid_argument("'min_step' must be positive");
+            Rcpp::stop("'min_step' must be positive");
         if (max_step < min_step)
-            throw std::invalid_argument("'max_step' must be greater than 'min_step'");
+            Rcpp::stop("'max_step' must be greater than 'min_step'");
         if (ftol <= 0 || ftol >= 0.5)
-            throw std::invalid_argument("'ftol' must satisfy 0 < ftol < 0.5");
+            Rcpp::stop("'ftol' must satisfy 0 < ftol < 0.5");
         if (wolfe <= ftol || wolfe >= 1)
-            throw std::invalid_argument("'wolfe' must satisfy ftol < wolfe < 1");
+            Rcpp::stop("'wolfe' must satisfy ftol < wolfe < 1");
     }
 };
 

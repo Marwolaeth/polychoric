@@ -4,9 +4,11 @@
 #ifndef LBFGSPP_LBFGSB_H
 #define LBFGSPP_LBFGSB_H
 
-#include <stdexcept>  // std::invalid_argument
 #include <vector>
 #include <Eigen/Core>
+#include <Rcpp.h>
+#include <RcppEigen.h>
+// [[Rcpp::depends(RcppEigen)]]
 #include "LBFGSpp/Param.h"
 #include "LBFGSpp/BFGSMat.h"
 #include "LBFGSpp/Cauchy.h"
@@ -121,7 +123,7 @@ public:
         // Dimension of the vector
         const int n = x.size();
         if (lb.size() != n || ub.size() != n)
-            throw std::invalid_argument("'lb' and 'ub' must have the same size as 'x'");
+            Rcpp::stop("'lb' and 'ub' must have the same size as 'x'");
 
         // Check whether the initial vector is within the bounds
         // If not, project to the feasible set

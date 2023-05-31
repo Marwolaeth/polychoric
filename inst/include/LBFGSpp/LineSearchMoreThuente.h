@@ -4,8 +4,8 @@
 #ifndef LBFGSPP_LINE_SEARCH_MORE_THUENTE_H
 #define LBFGSPP_LINE_SEARCH_MORE_THUENTE_H
 
-#include <stdexcept>  // std::invalid_argument, std::runtime_error
 #include <Eigen/Core>
+#include <Rcpp.h>
 #include "LBFGSpp/Param.h"
 
 namespace LBFGSpp {
@@ -220,9 +220,9 @@ public:
 
         // Check the value of step
         if (step <= Scalar(0))
-            throw std::invalid_argument("'step' must be positive");
+            Rcpp::stop("'step' must be positive");
         if (step > step_max)
-            throw std::invalid_argument("'step' exceeds 'step_max'");
+            Rcpp::stop("'step' exceeds 'step_max'");
 
         // Save the function value at the current x
         const Scalar fx_init = fx;
@@ -233,7 +233,7 @@ public:
 
         // Make sure d points to a descent direction
         if (dg_init >= Scalar(0))
-            throw std::logic_error("the moving direction does not decrease the objective function value");
+            Rcpp::stop("the moving direction does not decrease the objective function value");
 
         // Tolerance for convergence test
         // Sufficient decrease
@@ -349,10 +349,10 @@ public:
             step = new_step;
 
             if (step < param.min_step)
-                throw std::runtime_error("the line search step became smaller than the minimum value allowed");
+                Rcpp::stop("the line search step became smaller than the minimum value allowed");
 
             if (step > param.max_step)
-                throw std::runtime_error("the line search step became larger than the maximum value allowed");
+                Rcpp::stop("the line search step became larger than the maximum value allowed");
 
             // Update parameter, function value, and gradient
             x.noalias() = xp + step * drt;
@@ -393,7 +393,7 @@ public:
         }
 
         if (iter >= param.max_linesearch)
-            throw std::runtime_error("the line search routine reached the maximum number of iterations");
+            Rcpp::stop("the line search routine reached the maximum number of iterations");
     }
 };
 

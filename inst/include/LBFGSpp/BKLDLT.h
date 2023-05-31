@@ -5,7 +5,7 @@
 #define LBFGSPP_BK_LDLT_H
 
 #include <vector>
-#include <stdexcept>
+#include <Rcpp.h>
 #include <Eigen/Core>
 
 /// \cond
@@ -393,7 +393,7 @@ public:
 
         m_n = mat.rows();
         if (m_n != mat.cols())
-            throw std::invalid_argument("BKLDLT: matrix must be square");
+            Rcpp::stop("BKLDLT: matrix must be square");
 
         m_perm.setLinSpaced(m_n, 0, m_n - 1);
         m_permc.clear();
@@ -443,8 +443,7 @@ public:
     // Solve Ax=b
     void solve_inplace(GenericVector b) const
     {
-        if (!m_computed)
-            throw std::logic_error("BKLDLT: need to call compute() first");
+        if (!m_computed) Rcpp::stop("Solver fatal error");
 
         // PAP' = LDL'
         // 1. b -> Pb
