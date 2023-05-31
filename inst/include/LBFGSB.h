@@ -141,8 +141,8 @@ public:
         if (fpast > 0)
             m_fx[0] = fx;
 
-        // std::cout << "x0 = " << x.transpose() << std::endl;
-        // std::cout << "f(x0) = " << fx << ", ||proj_grad|| = " << m_projgnorm << std::endl << std::endl;
+
+
 
         // Early exit if the initial x is already a minimizer
         if (m_projgnorm <= m_param.epsilon || m_projgnorm <= m_param.epsilon_rel * x.norm())
@@ -157,9 +157,7 @@ public:
 
         /* Vector gcp(n);
         Scalar fcp = f(xcp, gcp);
-        Scalar projgcpnorm = proj_grad_norm(xcp, gcp, lb, ub);
-        std::cout << "xcp = " << xcp.transpose() << std::endl;
-        std::cout << "f(xcp) = " << fcp << ", ||proj_grad|| = " << projgcpnorm << std::endl << std::endl; */
+        Scalar projgcpnorm = proj_grad_norm(xcp, gcp, lb, ub);*/
 
         // Initial direction
         m_drt.noalias() = xcp - x;
@@ -207,10 +205,6 @@ public:
             // New projected gradient norm
             m_projgnorm = proj_grad_norm(x, m_grad, lb, ub);
 
-            /* std::cout << "** Iteration " << k << std::endl;
-            std::cout << "   x = " << x.transpose() << std::endl;
-            std::cout << "   f(x) = " << fx << ", ||proj_grad|| = " << m_projgnorm << std::endl << std::endl; */
-
             // Convergence test -- gradient
             if (m_projgnorm <= m_param.epsilon || m_projgnorm <= m_param.epsilon_rel * x.norm())
             {
@@ -253,9 +247,7 @@ public:
 
             /*Vector gsm(n);
             Scalar fsm = f(x + m_drt, gsm);
-            Scalar projgsmnorm = proj_grad_norm(x + m_drt, gsm, lb, ub);
-            std::cout << "xsm = " << (x + m_drt).transpose() << std::endl;
-            std::cout << "f(xsm) = " << fsm << ", ||proj_grad|| = " << projgsmnorm << std::endl << std::endl;*/
+            Scalar projgsmnorm = proj_grad_norm(x + m_drt, gsm, lb, ub);*/
 
             k++;
         }

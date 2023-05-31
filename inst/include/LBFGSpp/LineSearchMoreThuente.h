@@ -67,7 +67,7 @@ private:
         const Scalar z3 = (ga + gb) * ba - Scalar(2) * fba;
         const Scalar z2 = Scalar(0.5) * (gba * ba2 - Scalar(3) * apb * z3);
         const Scalar z1 = fba * ba2 - apb * z2 - (a * apb + b * b) * z3;
-        // std::cout << "z1 = " << z1 << ", z2 = " << z2 << ", z3 = " << z3 << std::endl;
+
 
         // If c3 = z/(b-a)^3 == 0, reduce to quadratic problem
         const Scalar eps = std::numeric_limits<Scalar>::epsilon();
@@ -134,10 +134,10 @@ private:
         // ac: cubic interpolation of fl, ft, gl, gt
         // aq: quadratic interpolation of fl, gl, ft
         bool ac_exists;
-        // std::cout << "al = " << al << ", at = " << at << ", fl = " << fl << ", ft = " << ft << ", gl = " << gl << ", gt = " << gt << std::endl;
+
         const Scalar ac = cubic_minimizer(al, at, fl, ft, gl, gt, ac_exists);
         const Scalar aq = quadratic_minimizer(al, at, fl, gl, ft);
-        // std::cout << "ac = " << ac << ", aq = " << aq << std::endl;
+
         // Case 1: ft > fl
         if (ft > fl)
         {
@@ -216,7 +216,7 @@ public:
                            Scalar& step, Scalar& fx, Vector& grad, Scalar& dg, Vector& x)
     {
         using std::abs;
-        // std::cout << "========================= Entering line search =========================\n\n";
+
 
         // Check the value of step
         if (step <= Scalar(0))
@@ -229,7 +229,7 @@ public:
         // Projection of gradient on the search direction
         const Scalar dg_init = dg;
 
-        // std::cout << "fx_init = " << fx_init << ", dg_init = " << dg_init << std::endl << std::endl;
+
 
         // Make sure d points to a descent direction
         if (dg_init >= Scalar(0))
@@ -251,13 +251,13 @@ public:
         fx = f(x, grad);
         dg = grad.dot(drt);
 
-        // std::cout << "max_step = " << step_max << ", step = " << step << ", fx = " << fx << ", dg = " << dg << std::endl;
+
 
         // Convergence test
         if (fx <= fx_init + step * test_decr && abs(dg) <= test_curv)
         {
-            // std::cout << "** Criteria met\n\n";
-            // std::cout << "========================= Leaving line search =========================\n\n";
+
+
             return;
         }
 
@@ -287,7 +287,7 @@ public:
                 fI_hi = ft;
                 gI_hi = gt;
 
-                // std::cout << "Case 1: new step = " << new_step << std::endl;
+
             }
             else if (gt * (I_lo - step) > Scalar(0))
             {
@@ -312,7 +312,7 @@ public:
                 fI_lo = ft;
                 gI_lo = gt;
 
-                // std::cout << "Case 2: new step = " << new_step << std::endl;
+
             }
             else
             {
@@ -327,7 +327,7 @@ public:
                 fI_lo = ft;
                 gI_lo = gt;
 
-                // std::cout << "Case 3: new step = " << new_step << std::endl;
+
             }
 
             // Case 1 and 3 are interpolations, whereas Case 2 is extrapolation
@@ -341,8 +341,8 @@ public:
             // In case step, new_step, and step_max are equal, directly return the computed x and fx
             if (step == step_max && new_step >= step_max)
             {
-                // std::cout << "** Maximum step size reached\n\n";
-                // std::cout << "========================= Leaving line search =========================\n\n";
+
+
                 return;
             }
             // Otherwise, recompute x and fx based on new_step
@@ -359,13 +359,13 @@ public:
             fx = f(x, grad);
             dg = grad.dot(drt);
 
-            // std::cout << "step = " << step << ", fx = " << fx << ", dg = " << dg << std::endl;
+
 
             // Convergence test
             if (fx <= fx_init + step * test_decr && abs(dg) <= test_curv)
             {
-                // std::cout << "** Criteria met\n\n";
-                // std::cout << "========================= Leaving line search =========================\n\n";
+
+
                 return;
             }
 
@@ -385,8 +385,8 @@ public:
                 const Scalar ft = fx - fx_init - step * test_decr;
                 if (ft <= fI_lo)
                 {
-                    // std::cout << "** Maximum step size reached\n\n";
-                    // std::cout << "========================= Leaving line search =========================\n\n";
+
+
                     return;
                 }
             }

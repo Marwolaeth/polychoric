@@ -87,7 +87,7 @@ public:
         const BFGSMat<Scalar, true>& bfgs, const Vector& x0, const Vector& g, const Vector& lb, const Vector& ub,
         Vector& xcp, Vector& vecc, IndexSet& newact_set, IndexSet& fv_set)
     {
-        // std::cout << "========================= Entering GCP search =========================\n\n";
+
 
         // Initialization
         const int n = x0.size();
@@ -139,8 +139,6 @@ public:
         const int nfree = fv_set.size();
         if ((nfree < 1) && (nord < 1))
         {
-            /* std::cout << "** All coordinates at boundary **\n";
-            std::cout << "\n========================= Leaving GCP search =========================\n\n"; */
             return;
         }
 
@@ -167,10 +165,7 @@ public:
         Scalar iu = (nord < 1) ? inf : brk[ord[b]];
         Scalar deltat = iu - il;
 
-        /* int iter = 0;
-        std::cout << "** Iter " << iter << " **\n";
-        std::cout << "   fp = " << fp << ", fpp = " << fpp << ", deltatmin = " << deltatmin << std::endl;
-        std::cout << "   il = " << il << ", iu = " << iu << ", deltat = " << deltat << std::endl; */
+        /* int iter = 0; */
 
         // If deltatmin >= deltat, we need to do the following things:
         // 1. Update vecc
@@ -197,16 +192,16 @@ public:
             // We only need to update xcp from ord[b] to ord[bp], and then exit
             if ((nfree == 0) && (act_end == nord - 1))
             {
-                // std::cout << "** [ ";
+
                 for (int i = act_begin; i <= act_end; i++)
                 {
                     const int act = ord[i];
                     xcp[act] = (vecd[act] > Scalar(0)) ? ub[act] : lb[act];
                     newact_set.push_back(act);
-                    // std::cout << act + 1 << " ";
+
                 }
-                // std::cout << "] become active **\n\n";
-                // std::cout << "** All break points visited **\n\n";
+
+
 
                 crossed_all = true;
                 break;
@@ -214,7 +209,7 @@ public:
 
             // Step 3
             // Update xcp and d on active coordinates
-            // std::cout << "** [ ";
+
             fp += deltat * fpp;
             for (int i = act_begin; i <= act_end; i++)
             {
@@ -231,9 +226,9 @@ public:
                 vecp.noalias() += gact * wact;
                 vecd[act] = Scalar(0);
                 newact_set.push_back(act);
-                // std::cout << act + 1 << " ";
+
             }
-            // std::cout << "] become active **\n\n";
+
 
             // Step 4
             // Theoretical step size to move
@@ -280,7 +275,7 @@ public:
                 fv_set.push_back(coord);
             }
         }
-        // std::cout << "\n========================= Leaving GCP search =========================\n\n";
+
     }
 };
 

@@ -124,7 +124,7 @@ public:
         const Vector& lb, const Vector& ub, const Vector& Wd, const IndexSet& newact_set, const IndexSet& fv_set, int maxit,
         Vector& drt)
     {
-        // std::cout << "========================= Entering subspace minimization =========================\n\n";
+
 
         // d = xcp - x0
         drt.noalias() = xcp - x0;
@@ -133,12 +133,12 @@ public:
         // If there is no free variable, simply return drt
         if (nfree < 1)
         {
-            // std::cout << "========================= (Early) leaving subspace minimization =========================\n\n";
+
             return;
         }
 
-        // std::cout << "New active set = [ "; for(std::size_t i = 0; i < newact_set.size(); i++)  std::cout << newact_set[i] << " "; std::cout << "]\n";
-        // std::cout << "Free variable set = [ "; for(std::size_t i = 0; i < fv_set.size(); i++)  std::cout << fv_set[i] << " "; std::cout << "]\n\n";
+
+
 
         // Extract the rows of W in the free variable set
         Matrix WF = bfgs.Wb(fv_set);
@@ -218,11 +218,6 @@ public:
                 }
             }
 
-            /* std::cout << "** Iter " << k << " **\n";
-            std::cout << "   L = [ "; for(std::size_t i = 0; i < L_set.size(); i++)  std::cout << L_set[i] << " "; std::cout << "]\n";
-            std::cout << "   U = [ "; for(std::size_t i = 0; i < U_set.size(); i++)  std::cout << U_set[i] << " "; std::cout << "]\n";
-            std::cout << "   P = [ "; for(std::size_t i = 0; i < P_set.size(); i++)  std::cout << P_set[i] << " "; std::cout << "]\n\n"; */
-
             // Extract the rows of W in the P set
             Matrix WP = bfgs.Wb(P_set);
             // Solve y[P] = -inv(B[P, P]) * (B[P, L] * l[L] + B[P, U] * u[U] + c[P])
@@ -295,8 +290,8 @@ public:
             return;
         }
 
-        // std::cout << "** Minimization finished in " << k + 1 << " iteration(s) **\n\n";
-        // std::cout << "========================= Leaving subspace minimization =========================\n\n";
+
+
 
         subvec_assign(drt, fv_set, vecy);
     }
