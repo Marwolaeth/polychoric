@@ -39,6 +39,22 @@
 #' # (with a warning)
 #' x <- rnorm(nrow(gss12_values))
 #' polycorr(gss12_values$valspl, x)
+#' 
+#' @keywords category
+#' @keywords multivariate
+#' @keywords nonparametric
+#' @concept correlation
+#' @concept correlation matrix
+#' @concept polychoric
+#' @concept polychoric correlation
+#' @concept C++
+#' @concept survey
+#' @concept social science
+#' @concept ordinal
+#' @concept ordinal data
+#' @concept ordinal factor
+#' @concept likert
+#' @concept likert scale
 polycorr <- function(x, y = NULL, correct = 0.1, coef.only = TRUE) {
   x <- na.omit(x)
   if (!is.null(y)) {
