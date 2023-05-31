@@ -6,20 +6,12 @@ required_packages <- c(
   'pkgdown'
 )
 install.packages(required_packages, type = 'source', INSTALL_opts = '--byte-compile')
-
 library(devtools)
-package_info()
-packageVersion("devtools")
-packageVersion("roxygen2")
 
 use_git()
 use_github()
-# 
-# usethis::use_testthat()
-# use_test()
 
 load_all()
-# .rs.setClangDiagnostics(0)
 
 ?check
 check(document = TRUE, remote = TRUE)
@@ -27,4 +19,6 @@ check(document = TRUE, remote = TRUE)
 use_mit_license()
 
 document()
-use_rcpp_eigen()
+
+use_data(gss12_values)
+use_data_raw('gss_extract_values')
