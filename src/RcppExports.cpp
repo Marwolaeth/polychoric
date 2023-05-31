@@ -24,15 +24,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // poly_xy
-double poly_xy(Eigen::VectorXd x, Eigen::VectorXd y, double correct);
-RcppExport SEXP _polychoric_poly_xy(SEXP xSEXP, SEXP ySEXP, SEXP correctSEXP) {
+double poly_xy(const Eigen::VectorXd& X, const Eigen::VectorXd& Y, double correct);
+RcppExport SEXP _polychoric_poly_xy(SEXP XSEXP, SEXP YSEXP, SEXP correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::VectorXd >::type x(xSEXP);
-    Rcpp::traits::input_parameter< Eigen::VectorXd >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type Y(YSEXP);
     Rcpp::traits::input_parameter< double >::type correct(correctSEXP);
-    rcpp_result_gen = Rcpp::wrap(poly_xy(x, y, correct));
+    rcpp_result_gen = Rcpp::wrap(poly_xy(X, Y, correct));
     return rcpp_result_gen;
 END_RCPP
 }

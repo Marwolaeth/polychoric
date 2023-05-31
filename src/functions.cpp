@@ -57,8 +57,43 @@
  Volume 27, Number 4, pages 1075-1090, December 1956.
  */
 
+Eigen::Array<bool, Eigen::Dynamic, 1> is_na(const Eigen::VectorXd& x) {
+  return x.array().isNaN();
+}
+
+// Find pairwise complete observations for two vectors
+Eigen::Array<bool, Eigen::Dynamic, 1> pairwise_complete(
+    const Eigen::VectorXd& x, const Eigen::VectorXd& y
+) {
+  Eigen::Array<bool, Eigen::Dynamic, 1> miss_x = x.array().isNaN();
+  Eigen::Array<bool, Eigen::Dynamic, 1> miss_y = y.array().isNaN();
+  return !(miss_x || miss_y);
+}
+
+// Filter vector based on the boolean mask
+Eigen::VectorXd filter(const Eigen::VectorXd& x, const Eigen::Array<bool, Eigen::Dynamic, 1>& mask) {
+  // Vreate empty vector to store selected values
+  Eigen::VectorXd xc = {};
+  
+  // Filter the array based on the mask
+  for (int i = 0; i < x.size(); i++) {
+    // Analogous to std::push_back()
+    if (mask(i)) {
+      Eigen::VectorXd tmp = xc;
+      xc.resize(xc.size()+1);
+      xc.head(tmp.size()) = tmp;
+      xc(xc.size()-1) = x(i);
+    }
+  }
+  
+  return xc;
+}
+
 // Function to count number of unique values in a vector
-int n_unique(const Eigen::VectorXd& x) {
+int n_unique(const Eigen::VectorXd& X) {
+  // Filter out NA values
+  Eigen::VectorXd x = filter(X, !is_na(X));
+  
   int n = x.size();
   std::unordered_set<double> seen;
   for (int i = 0; i < n; i++) {
@@ -69,7 +104,11 @@ int n_unique(const Eigen::VectorXd& x) {
 
 // Function to calculate rank of vector elements with ties resolved by mean rank
 Eigen::VectorXd rank_vec(const Eigen::VectorXd& v) {
-  std::vector<std::size_t> w(v.size());
+  // Filter out NA values
+  Eigen::VectorXd x = filter(v, !is_na(v));
+  int n = x.size();
+  
+  std::vector<std::size_t> w(n);
   std::iota(begin(w), end(w), 0);
   std::sort(begin(w), end(w), 
             [&v](std::size_t i, std::size_t j) { return v(i) < v(j); });
@@ -90,7 +129,12 @@ Eigen::VectorXd rank_vec(const Eigen::VectorXd& v) {
   return r;
 }
 
-double cor_spearman(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
+double cor_spearman(const Eigen::VectorXd& X, const Eigen::VectorXd& Y) {
+  // Filter for pairwise complete observations
+  Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, Y);
+  Eigen::VectorXd x = filter(X, pco);
+  Eigen::VectorXd y = filter(Y, pco);
+  
   long long int n = x.size();
   Eigen::VectorXd d(n);
   double rho;
@@ -341,10 +385,14 @@ double dl_drho(
 
 // Function to estimate thresholds from an Eigen VectorXd object
 Eigen::VectorXd estimate_thresholds(
-    const Eigen::VectorXd& x,
+    const Eigen::VectorXd& X,
     int N,
     double correct = 0.1
 ) {
+  // Filter out NA values
+  Eigen::VectorXd x = filter(X, !is_na(X));
+  N = x.size();
+  
   int m = x.maxCoeff();
   Eigen::VectorXd counts = Eigen::VectorXd::Zero(m);
   for (int i = 0; i < N; i++) {
@@ -465,10 +513,15 @@ Eigen::MatrixXd contingency_table(
 // Polychoric correlation of two ordinal (integer) vectors
 // [[Rcpp::export(.poly_xy)]]
 double poly_xy(
-    Eigen::VectorXd x,
-    Eigen::VectorXd y,
+    const Eigen::VectorXd& X,
+    const Eigen::VectorXd& Y,
     double correct = 0.1
 ) {
+  // Filter for pairwise complete observations
+  Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, Y);
+  Eigen::VectorXd x = filter(X, pco);
+  Eigen::VectorXd y = filter(Y, pco);
+  
   // Check if variables are discrete with reasonable number of levels
   if ((n_unique(x) > 10) || (n_unique(y) > 10)) {
     Rcpp::warning(
@@ -562,9 +615,14 @@ Eigen::MatrixXd poly_df(Rcpp::List X, double correct = 0.1) {
     x = items[i];
     gamma = thresholds[i];
     cont_x = (gamma.size() == 0);
+    Eigen::Array<bool, Eigen::Dynamic, 1> x_complete = !is_na(x);
     for (int j = 0; j < i; j++) {
       y = items[j];
       tau = thresholds[j];
+      // Filter for pairwise complete observations
+      Eigen::Array<bool, Eigen::Dynamic, 1> y_complete = !is_na(y);
+      Eigen::VectorXd xc = filter(x, x_complete && y_complete);
+      Eigen::VectorXd yc = filter(y, x_complete && y_complete);
       // If at least one variable suspected to be continuous
       cont_y = (tau.size() == 0);
       if (cont_x || cont_y) {
@@ -573,7 +631,7 @@ Eigen::MatrixXd poly_df(Rcpp::List X, double correct = 0.1) {
         );
         rho = cor_spearman(x, y);
       } else {
-        rho = poly_xy_inside(x, y, correct, gamma, tau);
+        rho = poly_xy_inside(xc, yc, correct, gamma, tau);
       }
       Corr(i,j) = rho;
       Corr(j,i) = rho;
@@ -719,9 +777,14 @@ Rcpp::List poly_df_full(Rcpp::List X, double correct = 0.1) {
     x = items[i];
     gamma = thresholds[i];
     cont_x = (gamma.size() == 0);
+    Eigen::Array<bool, Eigen::Dynamic, 1> x_complete = !is_na(x);
     for (int j = 0; j < i; j++) {
       y = items[j];
       tau = thresholds[j];
+      // Filter for pairwise complete observations
+      Eigen::Array<bool, Eigen::Dynamic, 1> y_complete = !is_na(y);
+      Eigen::VectorXd xc = filter(x, x_complete && y_complete);
+      Eigen::VectorXd yc = filter(y, x_complete && y_complete);
       // If at least one variable suspected to be continuous
       cont_y = (tau.size() == 0);
       if (cont_x || cont_y) {
@@ -730,12 +793,12 @@ Rcpp::List poly_df_full(Rcpp::List X, double correct = 0.1) {
         );
         rho = cor_spearman(x, y);
       } else {
-        rho = poly_xy_inside(x, y, correct, gamma, tau);
+        rho = poly_xy_inside(xc, yc, correct, gamma, tau);
       }
       Corr(i,j) = rho;
       Corr(j,i) = rho;
       // Calculate p-value
-      double pval = poly_pval(rho, N);
+      double pval = poly_pval(rho, xc.size());
       Pval(i,j) = pval;
       Pval(j,i) = pval;
     }

@@ -45,6 +45,19 @@ head(df, 13)
 polycorr(df)
 polycorr(df, coef.only = FALSE)
 
+#### Missing values ----
+df_miss <- df
+mask <- matrix(
+  sample(c(TRUE, FALSE), n*ncol(df), replace = TRUE, prob = c(.9, .1)),
+  nrow = n
+)
+df_miss[!mask] <- NA
+summary(df_miss)
+polycorr(df_miss)
+.poly_xy(df_miss$s1, df_miss$t3)
+.poly_xy(df$s1, df$t3)
+polycorr(df_miss, coef.only = FALSE)
+
 #### Correlate + continuous ----
 df$c1 <- rlnorm(n, 4, .4)
 head(df, 13)
@@ -56,14 +69,14 @@ head(df_num, 13)
 psych::mixedCor(df_num)
 
 library(psych)
-library(microbenchmark)
-bm <- microbenchmark(
-  psych = mixedCor(df_num),
-  eigen = polycorr(df),
-  times = 1111L,
-  control = list(warmup = 100L)
-)
-bm
+# library(microbenchmark)
+# bm <- microbenchmark(
+#   psych = mixedCor(df_num),
+#   eigen = polycorr(df),
+#   times = 1111L,
+#   control = list(warmup = 100L)
+# )
+# bm
 
 ## GSS 2012 CULTURE MODULE ----
 data("gss12_values", package = 'polychoric')

@@ -13,6 +13,9 @@
 #' 
 #' The computation of polychoric correlation coefficients involves estimating the thresholds (here called `gamma` and `tau`, like in (*Drasgow 1986*), or just `tau` as in `psych` package (*Revelle 2023*)) that separate the ordinal categories for each variable. These thresholds are used to transform the ordinal data into a set of continuous variables, which can then be used to estimate the correlation coefficient using standard methods. The `polycorr()` function currently estimates the thresholds using a two-step maximum likelihood estimation, where first the thresholds are deduced from univariate distributions of ordinal variables and then the `L-BFGS-B` optimization algorithm (*Yixuan 2023*) is used to find the value of the correlation coefficient `rho` that maximizes the likelihood of the observed contingency table. The `toms462` (*Donnelly 1973*, *Owen 1956*) algorithm is used to approximate the bivariate normal distribution (quadrant probabilities) of threshold values.
 #'
+#' @note
+#' The `polycorr()` function always uses pairwise complete observations. Therefore, the user need not worry about missing data. However, depending on the analysis design and the ratio of missing data, it may be essential to check for patterns of missingness and consider imputation.
+#'
 #' @references Drasgow, Fritz (1986). Polychoric and polyserial correlations. The Encyclopedia of Statistics. 7. 68-74.
 #' @references Revelle, William (2023). _psych: Procedures for Psychological, Psychometric, and Personality Research_. Northwestern University, Evanston, Illinois. R package version 2.3.3, <https://CRAN.R-project.org/package=psych>.
 #' @references Olsson, Ulf (1979). Maximum Likelihood Estimation of the Polychoric Correlation Coefficient, Psychometrika, 44:443-460.
@@ -56,9 +59,7 @@
 #' @concept likert
 #' @concept likert scale
 polycorr <- function(x, y = NULL, correct = 0.1, coef.only = TRUE) {
-  x <- na.omit(x)
   if (!is.null(y)) {
-    y <- stats::na.omit(y)
     if (coef.only) {
       return(.poly_xy(x, y, correct = correct))
     } else {

@@ -5,8 +5,8 @@
     .Call('_polychoric_poly_tab', PACKAGE = 'polychoric', G, correct)
 }
 
-.poly_xy <- function(x, y, correct = 0.1) {
-    .Call('_polychoric_poly_xy', PACKAGE = 'polychoric', x, y, correct)
+.poly_xy <- function(X, Y, correct = 0.1) {
+    .Call('_polychoric_poly_xy', PACKAGE = 'polychoric', X, Y, correct)
 }
 
 .poly_df <- function(X, correct = 0.1) {
