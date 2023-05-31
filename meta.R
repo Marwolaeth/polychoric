@@ -17,4 +17,4 @@ check(document = TRUE, remote = TRUE)
 
 # use_mit_license()
 
-use_data(gss12_values)
+# use_data(gss12_values)
