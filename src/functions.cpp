@@ -95,9 +95,9 @@ double cor_spearman(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
   Eigen::VectorXd d(n);
   double rho;
   // check for equal length
-  if (y.size() != n) {
-    Rcpp::stop("Vectors are of different dimensionality");
-  }
+  // if (y.size() != n) {
+  //   Rcpp::stop("Vectors are of different dimensionality");
+  // }
   d = rank_vec(x).array() - rank_vec(y).array();
   rho = 1.0 - (6.0 * (d.dot(d))) / (n*(n*n - 1));
   rho = (rho < -1.0) ? -1.0 : rho;
@@ -123,9 +123,9 @@ double Phi(double x, double e = 0.0, double s = 1.0) {
 
 double Phi_inv(double p, double e = 0.0, double s = 1.0) {
   // check for valid input probability
-  if (p < 0.0 || p > 1.0) {
-    Rcpp::stop("Invalid input probability");
-  }
+  // if (p < 0.0 || p > 1.0) {
+  //   Rcpp::stop("Invalid input probability");
+  // }
   // initial guess for inverse CDF value
   double z = 0.0;
   // use Newton's method to iteratively solve for inverse CDF value
@@ -148,9 +148,9 @@ Eigen::VectorXd Phi_inv_vec(
     double s = 1.0
 ) {
   // check for valid input standard deviations
-  if (s <= 0) {
-    Rcpp::stop("Standard deviation must be positive");
-  }
+  // if (s <= 0) {
+  //   Rcpp::stop("Standard deviation must be positive");
+  // }
   int n = p.size();
   Eigen::VectorXd x(n);
   for (int i = 0; i < n; i++) {
@@ -169,9 +169,9 @@ double phi2(
     double s2 = 1.0
 ) {
   double pi = std::atan(1) * 4; // calculate pi
-  if (s1 <= 0 || s2 <= 0) {
-    Rcpp::stop("Standard deviation must be positive");
-  }
+  // if (s1 <= 0 || s2 <= 0) {
+  //   Rcpp::stop("Standard deviation must be positive");
+  // }
   double z1 = (x - e1) / s1; // calculate standardized value of x
   double z2 = (y - e2) / s2; // calculate standardized value of y
   // calculate PDF value
@@ -190,9 +190,9 @@ double Phi2(
     double s2 = 1.0
 ) {
   double pi = std::atan(1) * 4; // calculate pi
-  if (s1 <= 0 || s2 <= 0) {
-    Rcpp::stop("Standard deviation must be positive");
-  }
+  // if (s1 <= 0 || s2 <= 0) {
+  //   Rcpp::stop("Standard deviation must be positive");
+  // }
   double z1 = (x - e1) / s1; // calculate standardized value of x
   double z2 = (y - e2) / s2; // calculate standardized value of y
   double cdf = bivnor(-z1, -z2, r);
@@ -212,9 +212,9 @@ Eigen::MatrixXd grid_discretised_normal_pmf(
 ) {
   int n = X.size();
   int m = Y.size();
-  if (s1 <= 0 || s2 <= 0) {
-    Rcpp::stop("Standard deviation must be positive");
-  }
+  // if (s1 <= 0 || s2 <= 0) {
+  //   Rcpp::stop("Standard deviation must be positive");
+  // }
   // append large values to X and Y
   Eigen::VectorXd Xa(n+1);
   for (int i = 0; i < n; i++) {
@@ -267,9 +267,9 @@ double contingency_table_loglik(const Eigen::MatrixXd& G, const Eigen::MatrixXd&
   // Compute log likelihood of contingency table G given matrix of probabilities P
   int r = G.rows();
   int s = G.cols();
-  if (r != P.rows() || s != P.cols()) {
-    Rcpp::stop("Input matrices must have same dimensions");
-  }
+  // if (r != P.rows() || s != P.cols()) {
+  //   Rcpp::stop("Input matrices must have same dimensions");
+  // }
   double loglik = 0.0;
   for (int i = 0; i < r; i++) {
     for (int j = 0; j < s; j++) {

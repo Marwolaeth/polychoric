@@ -45,6 +45,7 @@ polycorr(gss12_values)
 # (with a warning)
 x <- rnorm(nrow(gss12_values))
 polycorr(gss12_values$valspl, x)
+
 }
 \references{
 Drasgow, Fritz (1986). Polychoric and polyserial correlations. The Encyclopedia of Statistics. 7. 68-74.
@@ -59,3 +60,18 @@ Owen, Donald (1956). Tables for Computing Bivariate Normal Probabilities, Annals
 
 Qiu, Yixuan (2023). LBFGS++: A Header-only C++ Library for L-BFGS and L-BFGS-B Algorithms. Available at: https://lbfgspp.statr.me/
 }
+\concept{C++}
+\concept{correlation}
+\concept{correlation matrix}
+\concept{likert}
+\concept{likert scale}
+\concept{ordinal}
+\concept{ordinal data}
+\concept{ordinal factor}
+\concept{polychoric}
+\concept{polychoric correlation}
+\concept{social science}
+\concept{survey}
+\keyword{category}
+\keyword{multivariate}
+\keyword{nonparametric}

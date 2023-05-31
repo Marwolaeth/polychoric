@@ -1,4 +1,4 @@
-^.git$
+^.git
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
