@@ -1,7 +1,5 @@
 # include <cmath>
 # include <cstdlib>
-# include <iostream>
-# include <iomanip>
 
 using namespace std;
 
