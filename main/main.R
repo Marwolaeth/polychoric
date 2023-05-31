@@ -84,3 +84,18 @@ polycorr(gss12_values$valspl, x)
 ## IN LIBRARY ----
 library(polychoric)
 ?polycorr
+
+## BENCHMARK ----
+library(microbenchmark)
+library(psych)
+gss_num <- gss12_values |> lapply(as.integer) |> as.data.frame()
+head(gss_num, 13)
+gc()
+
+bm <- microbenchmark(
+  standard = polychoric(gss_num),
+  polycorr = polycorr(gss12_values),
+  times = 32L,
+  control = list(warmup = 6)
+)
+bm
