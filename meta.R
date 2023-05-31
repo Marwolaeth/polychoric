@@ -13,8 +13,11 @@ library(devtools)
 
 load_all()
 
-check(document = TRUE, remote = TRUE)
+check(document = TRUE, remote = TRUE, cran = TRUE)
 
 # use_mit_license()
 
 # use_data(gss12_values)
+
+use_readme_rmd()
+build_readme()

@@ -5,3 +5,4 @@
 ^meta
 ^.*template.*
 ^data-raw$
+^README\.Rmd$
