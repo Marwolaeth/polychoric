@@ -8,17 +8,13 @@ required_packages <- c(
 install.packages(required_packages, type = 'source', INSTALL_opts = '--byte-compile')
 library(devtools)
 
-use_git()
-use_github()
+# use_git()
+# use_github()
 
 load_all()
 
-?check
 check(document = TRUE, remote = TRUE)
 
-use_mit_license()
-
-document()
+# use_mit_license()
 
 use_data(gss12_values)
-use_data_raw('gss_extract_values')

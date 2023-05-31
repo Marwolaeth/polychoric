@@ -24,7 +24,7 @@
 #' @references Qiu, Yixuan (2023). LBFGS++: A Header-only C++ Library for L-BFGS and L-BFGS-B Algorithms. Available at: https://lbfgspp.statr.me/
 #'
 #' @examples
-#' ## GSS 2012 Cultural Module
+#' ## GSS 2012 SCHWARTZ VALUES MODULE ----
 #' data("gss12_values", package = 'polychoric')
 #' # A pair of discrete vectors
 #' polycorr(gss12_values$valorig, gss12_values$valeql)

@@ -30,7 +30,7 @@ The computation of polychoric correlation coefficients involves estimating the t
 The `polycorr()` function always uses pairwise complete observations. Therefore, the user need not worry about missing data. However, depending on the analysis design and the ratio of missing data, it may be essential to check for patterns of missingness and consider imputation.
 }
 \examples{
-## GSS 2012 Cultural Module
+## GSS 2012 SCHWARTZ VALUES MODULE ----
 data("gss12_values", package = 'polychoric')
 # A pair of discrete vectors
 polycorr(gss12_values$valorig, gss12_values$valeql)

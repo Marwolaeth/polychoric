@@ -54,8 +54,6 @@ mask <- matrix(
 df_miss[!mask] <- NA
 summary(df_miss)
 polycorr(df_miss)
-.poly_xy(df_miss$s1, df_miss$t3)
-.poly_xy(df$s1, df$t3)
 polycorr(df_miss, coef.only = FALSE)
 
 #### Correlate + continuous ----
@@ -63,39 +61,22 @@ df$c1 <- rlnorm(n, 4, .4)
 head(df, 13)
 polycorr(df)
 
-#### Benchmark ----
-df_num <- lapply(df, as.numeric) |> as.data.frame()
-head(df_num, 13)
-psych::mixedCor(df_num)
-
-library(psych)
-# library(microbenchmark)
-# bm <- microbenchmark(
-#   psych = mixedCor(df_num),
-#   eigen = polycorr(df),
-#   times = 1111L,
-#   control = list(warmup = 100L)
-# )
-# bm
-
-## GSS 2012 CULTURE MODULE ----
+## GSS 2012 SCHWARTZ VALUES MODULE ----
 data("gss12_values", package = 'polychoric')
 
-# A pair of discrete vectors
+#### A pair of discrete vectors ----
 polycorr(gss12_values$valorig, gss12_values$valeql)
 polycorr(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
 
-# A contingency table
+#### A contingency table ----
 (G <- table(gss12_values$valorig, gss12_values$valeql))
 polycorr(G)
 
-# A data.frame
+#### A data.frame ----
 polycorr(gss12_values)
 
+#### Mixed variable types ----
 # For safety, returns Spearman's rho if at least one of the vectors
 # is presumably continuous (n_distinct(x) > 10 | n_distinct(y) > 10)
 x <- rnorm(nrow(gss12_values))
 polycorr(gss12_values$valspl, x)
-
-## HELP DOCUMENTATION ----
-?polycorr #Why???
