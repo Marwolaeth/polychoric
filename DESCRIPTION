@@ -16,5 +16,5 @@ LinkingTo: Rcpp, RcppEigen
 URL: https://github.com/Marwolaeth/polychoric
 BugReports: https://github.com/Marwolaeth/polychoric/issues
 Depends: 
-    R (>= 4.10)
+    R (>= 4.0)
 LazyData: true
