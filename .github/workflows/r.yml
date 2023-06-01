@@ -22,9 +22,9 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: windows-latest,  r: '4.0'}
-          - {os: macos-latest,    r: '4.0'}
-          - {os: ubuntu-latest,   r: '4.0'}
+          #- {os: windows-latest,  r: '4.0'}
+          #- {os: macos-latest,    r: '4.0'}
+          #- {os: ubuntu-latest,   r: '4.0'}
         
           - {os: macos-latest,   r: '4.1'}
           - {os: macos-latest,   r: '4.2'}
