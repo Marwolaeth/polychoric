@@ -22,16 +22,21 @@ jobs:
       fail-fast: false
       matrix:
         config:
+          - {os: windows-latest,  r: '4.0'}
+          - {os: macos-latest,    r: '4.0'}
+          - {os: ubuntu-latest,   r: '4.0'}
+        
           - {os: macos-latest,   r: '4.1'}
+          - {os: macos-latest,   r: '4.2'}
+          - {os: macos-latest,   r: '4.3'}
 
-          - {os: windows-latest, r: '4.2'}
-          # Use 3.6 to trigger usage of RTools35
           - {os: windows-latest, r: '4.1'}
-          # use 4.1 to check with rtools40's older compiler
+          - {os: windows-latest, r: '4.2'}
           - {os: windows-latest, r: '4.3'}
 
           - {os: ubuntu-latest,   r: '4.1'}
           - {os: ubuntu-latest,   r: '4.2'}
+          - {os: ubuntu-latest,   r: '4.3'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
