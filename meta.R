@@ -3,10 +3,12 @@
 
 required_packages <- c(
   'roxygen2',
-  'pkgdown'
+  'pkgdown',
+  'available'
 )
 install.packages(required_packages, type = 'source', INSTALL_opts = '--byte-compile')
 library(devtools)
+available::available('polychoric') # Hey!
 
 # use_git()
 # use_github()
