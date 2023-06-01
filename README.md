@@ -31,7 +31,9 @@ of a single numeric value or a correlation matrix.
 <summary>
 Spoiler
 </summary>
-*Pathetic amateurish craftsmanship*
+
+Pathetic amateurish craftsmanship
+
 </details>
 
 ## The Purpose
@@ -74,12 +76,18 @@ patterns in the data.
 
 ``` r
 library(polychoric)
+library(psych)
 if (!require(likert)) {
   install.packages('likert')
   library(likert)
 }
 #> Loading required package: likert
 #> Loading required package: ggplot2
+#> 
+#> Attaching package: 'ggplot2'
+#> The following objects are masked from 'package:psych':
+#> 
+#>     %+%, alpha
 #> Loading required package: xtable
 data("gss12_values", package = 'polychoric')
 head(gss12_values, 13)
@@ -105,6 +113,7 @@ head(gss12_values, 13)
 ```
 
 ``` r
+# likert() doesn't work with tibbles
 gss12_values |> as.data.frame() |> likert() |> plot()
 ```
 
@@ -139,7 +148,6 @@ polycorr(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
 ### For a contingency table
 
 ``` r
-#### A contingency table ----
 (G <- table(gss12_values$valorig, gss12_values$valeql))
 #>                     
 #>                      Not like me at all Not like me A little like me
@@ -159,6 +167,47 @@ polycorr(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
 #>   Very much like me                28      73               245
 polycorr(G)
 #> [1] 0.2373013
+# side with psych:polychoric()
+psych::polychoric(G, correct = .1)$rho
+#> [1] "You seem to have a table, I will return just one correlation."
+#> [1] 0.237309
+```
+
+Notice that threshold values are exactly the same for both functions:
+
+``` r
+polycorr(G, coef.only = FALSE)
+#> $rho
+#> [1] 0.2373013
+#> 
+#> $pval
+#> [1] 0
+#> 
+#> $gamma
+#> [1] -2.0537489 -1.4862570 -0.9486693 -0.1249568  0.5558306
+#> 
+#> $tau
+#> [1] -2.28503532 -1.89926319 -1.46841315 -0.85565031  0.01518016
+# side with psych:polychoric()
+psych::polychoric(G, correct = .1)
+#> [1] "You seem to have a table, I will return just one correlation."
+#> $rho
+#> [1] 0.237309
+#> 
+#> $objective
+#> [1] 2.730677
+#> 
+#> $tau.row
+#> Not like me at all        Not like me   A little like me   Somewhat like me 
+#>         -2.0537489         -1.4862570         -0.9486693         -0.1249568 
+#>            Like me 
+#>          0.5558306 
+#> 
+#> $tau.col
+#> Not like me at all        Not like me   A little like me   Somewhat like me 
+#>        -2.28503532        -1.89926319        -1.46841315        -0.85565031 
+#>            Like me 
+#>         0.01518016
 ```
 
 ### For a data frame
@@ -255,15 +304,69 @@ polycorr(gss12_values)
 #> valfun   0.17905717  0.249593070 1.00000000
 ```
 
+Let’s visualise and compare our matrices. We suggest `pheatmap` package
+for quick correlation matrix visualisation. `corrplot` is also a good
+option.
+
+``` r
+if (!require(pheatmap)) {
+  install.packages('pheatmap')
+  library(pheatmap)
+}
+#> Loading required package: pheatmap
+rho1 <- polycorr(gss12_values)
+# psych::polychoric() doesn't work with factor data directly
+gss_num <- gss12_values |> lapply(as.integer) |> as.data.frame()
+rho2 <- polychoric(gss_num)
+pheatmap(
+  rho2$rho,
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  display_numbers = TRUE,
+  number_format = '%.2f',
+  fontsize_number = 9
+)
+```
+
+<div class="figure">
+
+<img src="man/figures/README-example-corrmatrix-vis-1.png" alt="psych correlation matrix" width="100%" />
+<p class="caption">
+psych correlation matrix
+</p>
+
+</div>
+
+``` r
+pheatmap(
+  rho1,
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  display_numbers = TRUE,
+  number_format = '%.2f',
+  fontsize_number = 9
+)
+```
+
+<div class="figure">
+
+<img src="man/figures/README-example-corrmatrix-vis-2.png" alt="polychoric correlation matrix" width="100%" />
+<p class="caption">
+polychoric correlation matrix
+</p>
+
+</div>
+
 ### Handling mixed variable types
 
 The `polycorr()` function is currently limited in its flexibility as it
 only provides polychoric estimation for ordinal variables and does not
 support biserial or polyserial estimation for mixed ordinal and
 continuous variables. The function does, however, attempt to recognise
-potentially non-discrete variables, allowing for up to 10 levels. In
-comparison, the `polychoric()` function from the `psych` package allows
-up to 8 levels by default.
+potentially non-discrete variables, allowing for up to 10 levels, like
+in [World Values Survey](https://www.worldvaluessurvey.org/wvs.jsp)
+questionnaire items. In comparison, the `polychoric()` function from the
+`psych` package allows up to 8 levels by default.
 
 It’s worth noting that variables with a high number of distinct values
 may cause estimation issues, so the `polycorr()` function returns
@@ -274,7 +377,136 @@ x <- rnorm(nrow(gss12_values))
 polycorr(gss12_values$valspl, x)
 #> Warning in .poly_xy(x, y, correct = correct): Too many levels or continuous
 #> input: returning Spearman's rho
-#> [1] 0.009500079
+#> [1] 0.03751395
+```
+
+### Handling missing values
+
+The `polycorr()` function always uses pairwise complete observations.
+Therefore, the user need not worry about missing data. However,
+depending on the analysis design and the ratio of missing data, it may
+be essential to check for patterns of missingness and consider
+imputation.
+
+The General Social Survey Schwartz Values Module dataset is cleared of
+missing values (non-response or non-applicable). Here we introduce some
+NAs into random places across the dataset. The summary will show the
+dataset now actually contains missings.
+
+``` r
+gss_miss <- gss12_values
+mask <- matrix(
+  sample(
+    c(TRUE, FALSE),
+    nrow(gss_miss)*ncol(gss_miss),
+    replace = TRUE,
+    prob = c(.9, .1)
+  ),
+  nrow = nrow(gss_miss)
+)
+gss_miss[!mask] <- NA
+summary(gss_miss)
+#>                valorig                  valrich                   valeql   
+#>  Not like me at all: 24   Not like me at all:185   Not like me at all: 13  
+#>  Not like me       : 54   Not like me       :456   Not like me       : 20  
+#>  A little like me  :118   A little like me  :217   A little like me  : 50  
+#>  Somewhat like me  :312   Somewhat like me  :144   Somewhat like me  :141  
+#>  Like me           :307   Like me           : 69   Like me           :352  
+#>  Very much like me :334   Very much like me : 55   Very much like me :555  
+#>  NA's              :106   NA's              :129   NA's              :124  
+#>                valable                  valsafe                  valdiff   
+#>  Not like me at all: 49   Not like me at all: 29   Not like me at all: 37  
+#>  Not like me       :187   Not like me       :118   Not like me       :136  
+#>  A little like me  :198   A little like me  :130   A little like me  :173  
+#>  Somewhat like me  :273   Somewhat like me  :212   Somewhat like me  :300  
+#>  Like me           :245   Like me           :317   Like me           :271  
+#>  Very much like me :175   Very much like me :307   Very much like me :215  
+#>  NA's              :128   NA's              :142   NA's              :123  
+#>                valrule                  vallist                   valmod   
+#>  Not like me at all: 70   Not like me at all: 12   Not like me at all: 18  
+#>  Not like me       :192   Not like me       : 26   Not like me       : 65  
+#>  A little like me  :170   A little like me  : 94   A little like me  :104  
+#>  Somewhat like me  :239   Somewhat like me  :209   Somewhat like me  :238  
+#>  Like me           :269   Like me           :456   Like me           :392  
+#>  Very much like me :191   Very much like me :334   Very much like me :290  
+#>  NA's              :124   NA's              :124   NA's              :148  
+#>                 valspl                  valfree                  valcare   
+#>  Not like me at all: 74   Not like me at all:  8   Not like me at all:  7  
+#>  Not like me       :293   Not like me       : 44   Not like me       :  9  
+#>  A little like me  :231   A little like me  : 86   A little like me  : 61  
+#>  Somewhat like me  :239   Somewhat like me  :172   Somewhat like me  :191  
+#>  Like me           :174   Like me           :372   Like me           :415  
+#>  Very much like me :109   Very much like me :461   Very much like me :435  
+#>  NA's              :135   NA's              :112   NA's              :137  
+#>                valachv                  valdfnd                  valrisk   
+#>  Not like me at all: 52   Not like me at all: 30   Not like me at all: 91  
+#>  Not like me       :221   Not like me       : 97   Not like me       :282  
+#>  A little like me  :204   A little like me  :118   A little like me  :192  
+#>  Somewhat like me  :257   Somewhat like me  :212   Somewhat like me  :274  
+#>  Like me           :235   Like me           :377   Like me           :181  
+#>  Very much like me :170   Very much like me :293   Very much like me :118  
+#>  NA's              :116   NA's              :128   NA's              :117  
+#>                valprpr                  valrspt                  valdvot   
+#>  Not like me at all: 39   Not like me at all: 56   Not like me at all:  7  
+#>  Not like me       :160   Not like me       :279   Not like me       : 17  
+#>  A little like me  :171   A little like me  :201   A little like me  : 59  
+#>  Somewhat like me  :254   Somewhat like me  :323   Somewhat like me  :182  
+#>  Like me           :296   Like me           :188   Like me           :408  
+#>  Very much like me :216   Very much like me : 85   Very much like me :459  
+#>  NA's              :119   NA's              :123   NA's              :123  
+#>                 valeco                  valtrdn                   valfun   
+#>  Not like me at all: 11   Not like me at all: 38   Not like me at all: 24  
+#>  Not like me       : 46   Not like me       :117   Not like me       :127  
+#>  A little like me  :129   A little like me  :156   A little like me  :240  
+#>  Somewhat like me  :246   Somewhat like me  :252   Somewhat like me  :276  
+#>  Like me           :382   Like me           :302   Like me           :276  
+#>  Very much like me :302   Very much like me :233   Very much like me :178  
+#>  NA's              :139   NA's              :157   NA's              :134
+```
+
+Let’s rerun the estimation: the function works, though coefficients may
+be different.
+
+``` r
+pheatmap(
+  polycorr(gss_miss),
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  display_numbers = TRUE,
+  number_format = '%.2f',
+  fontsize_number = 9
+)
+```
+
+<img src="man/figures/README-example-missing-02-1.png" width="100%" />
+
+## Performance
+
+Probably the only reason the `polychoric` package may be useful is that
+it is fast. During alpha-testing of the source code, it was nearly 50x
+faster in creating a correlation matrix than the gold standard
+`psych::polychoric()`. The package version is 5 times slower than the
+raw source code. However, `polychoric` still introduces a significant
+improvement in performance and can save a market researcher a couple of
+minutes a day.
+
+``` r
+if (!require(microbenchmark)) {
+  install.packages('microbenchmark')
+  library(microbenchmark)
+}
+#> Loading required package: microbenchmark
+bm <- microbenchmark(
+  standard = polychoric(gss_num),
+  polycorr = polycorr(gss12_values),
+  times = 32L,
+  control = list(warmup = 6)
+)
+bm
+#> Unit: seconds
+#>      expr      min       lq     mean   median       uq      max neval cld
+#>  standard 2.427403 2.471133 2.507615 2.505675 2.531277 2.601148    32  a 
+#>  polycorr 2.764569 2.797821 2.827391 2.824256 2.859528 2.915081    32   b
 ```
 
 ## Development

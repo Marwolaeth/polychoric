@@ -35,7 +35,8 @@ Polychoric is a package that provides a wrapper for C++ routines used to calcula
 <details>
   <summary>Spoiler</summary>
   
-  *Pathetic amateurish craftsmanship*
+  Pathetic amateurish craftsmanship
+  
  </details>
   
 ## The Purpose
@@ -51,6 +52,7 @@ Polychoric correlation coefficients are useful for analyzing data that involve o
 
 ```{r example-data}
 library(polychoric)
+library(psych)
 if (!require(likert)) {
   install.packages('likert')
   library(likert)
@@ -60,6 +62,7 @@ head(gss12_values, 13)
 ```
 
 ```{r example-data-plot}
+# likert() doesn't work with tibbles
 gss12_values |> as.data.frame() |> likert() |> plot()
 ```
 
@@ -80,9 +83,18 @@ polycorr(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
 ### For a contingency table
 
 ```{r example-contingency}
-#### A contingency table ----
 (G <- table(gss12_values$valorig, gss12_values$valeql))
 polycorr(G)
+# side with psych:polychoric()
+psych::polychoric(G, correct = .1)$rho
+```
+
+Notice that threshold values are exactly the same for both functions:
+
+```{r example-contingency-full}
+polycorr(G, coef.only = FALSE)
+# side with psych:polychoric()
+psych::polychoric(G, correct = .1)
 ```
 
 ### For a data frame
@@ -91,15 +103,100 @@ polycorr(G)
 polycorr(gss12_values)
 ```
 
+Let's visualise and compare our matrices. We suggest `pheatmap` package for quick correlation matrix visualisation. `corrplot` is also a good option.
+
+```{r example-corrmatrix-vis}
+#| layout-ncol: 2
+#| fig-cap: 
+#|   - "psych correlation matrix"
+#|   - "polychoric correlation matrix"
+if (!require(pheatmap)) {
+  install.packages('pheatmap')
+  library(pheatmap)
+}
+rho1 <- polycorr(gss12_values)
+# psych::polychoric() doesn't work with factor data directly
+gss_num <- gss12_values |> lapply(as.integer) |> as.data.frame()
+rho2 <- polychoric(gss_num)
+pheatmap(
+  rho2$rho,
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  display_numbers = TRUE,
+  number_format = '%.2f',
+  fontsize_number = 9
+)
+pheatmap(
+  rho1,
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  display_numbers = TRUE,
+  number_format = '%.2f',
+  fontsize_number = 9
+)
+```
+
 ### Handling mixed variable types
 
-The `polycorr()` function is currently limited in its flexibility as it only provides polychoric estimation for ordinal variables and does not support biserial or polyserial estimation for mixed ordinal and continuous variables. The function does, however, attempt to recognise potentially non-discrete variables, allowing for up to 10 levels. In comparison, the `polychoric()` function from the `psych` package allows up to 8 levels by default.
+The `polycorr()` function is currently limited in its flexibility as it only provides polychoric estimation for ordinal variables and does not support biserial or polyserial estimation for mixed ordinal and continuous variables. The function does, however, attempt to recognise potentially non-discrete variables, allowing for up to 10 levels, like in [World Values Survey](https://www.worldvaluessurvey.org/wvs.jsp) questionnaire items. In comparison, the `polychoric()` function from the `psych` package allows up to 8 levels by default.
 
 It's worth noting that variables with a high number of distinct values may cause estimation issues, so the `polycorr()` function returns Spearman's $\rho$ instead (with a warning).
 
 ```{r example-mixed}
 x <- rnorm(nrow(gss12_values))
 polycorr(gss12_values$valspl, x)
+```
+
+### Handling missing values
+
+The `polycorr()` function always uses pairwise complete observations. Therefore, the user need not worry about missing data. However, depending on the analysis design and the ratio of missing data, it may be essential to check for patterns of missingness and consider imputation.
+
+The General Social Survey Schwartz Values Module dataset is cleared of missing values (non-response or non-applicable). Here we introduce some NAs into random places across the dataset. The summary will show the dataset now actually contains missings.
+
+```{r example-missing-01}
+gss_miss <- gss12_values
+mask <- matrix(
+  sample(
+    c(TRUE, FALSE),
+    nrow(gss_miss)*ncol(gss_miss),
+    replace = TRUE,
+    prob = c(.9, .1)
+  ),
+  nrow = nrow(gss_miss)
+)
+gss_miss[!mask] <- NA
+summary(gss_miss)
+```
+
+Let's rerun the estimation: the function works, though coefficients may be different.
+
+```{r example-missing-02}
+pheatmap(
+  polycorr(gss_miss),
+  cluster_rows = FALSE,
+  cluster_cols = FALSE,
+  display_numbers = TRUE,
+  number_format = '%.2f',
+  fontsize_number = 9
+)
+```
+
+## Performance
+
+Probably the only reason the `polychoric` package may be useful is that it is fast. During alpha-testing of the source code, it was nearly 50x faster in creating a correlation matrix than the gold standard `psych::polychoric()`. The package version is 5 times slower than the raw source code. However, `polychoric` still introduces a significant improvement in performance and can save a market researcher a couple of minutes a day.
+
+```{r benchmark}
+if (!require(microbenchmark)) {
+  install.packages('microbenchmark')
+  library(microbenchmark)
+}
+bm <- microbenchmark(
+  standard = polychoric(gss_num),
+  polycorr = polycorr(gss12_values),
+  times = 32L,
+  control = list(warmup = 6)
+)
+bm
 ```
 
 ## Development
