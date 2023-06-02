@@ -58,7 +58,12 @@
 #' @concept ordinal factor
 #' @concept likert
 #' @concept likert scale
-polycorr <- function(x, y = NULL, correct = 0.1, coef.only = TRUE) {
+polycorr <- function(
+    x,
+    y = NULL,
+    correct = 0.1,
+    coef.only = TRUE
+) {
   if (!is.null(y)) {
     if (coef.only) {
       return(.poly_xy(x, y, correct = correct))
@@ -87,3 +92,4 @@ polycorr <- function(x, y = NULL, correct = 0.1, coef.only = TRUE) {
     return(res)
   }
 }
+
