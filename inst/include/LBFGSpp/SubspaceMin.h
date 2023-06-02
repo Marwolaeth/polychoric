@@ -4,11 +4,8 @@
 #ifndef LBFGSPP_SUBSPACE_MIN_H
 #define LBFGSPP_SUBSPACE_MIN_H
 
-#include <stdexcept>
 #include <vector>
-// #include <Eigen/Core>
-#include <RcppEigen.h>
-// [[Rcpp::depends(RcppEigen)]]
+#include <Eigen/Core>
 #include "BFGSMat.h"
 
 /// \cond

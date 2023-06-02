@@ -5,10 +5,7 @@
 #define LBFGSPP_LBFGSB_H
 
 #include <vector>
-// #include <Eigen/Core>
-#include <Rcpp.h>
-#include <RcppEigen.h>
-// [[Rcpp::depends(RcppEigen)]]
+#include <Eigen/Core>
 #include "LBFGSpp/Param.h"
 #include "LBFGSpp/BFGSMat.h"
 #include "LBFGSpp/Cauchy.h"

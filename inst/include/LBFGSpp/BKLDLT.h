@@ -5,10 +5,7 @@
 #define LBFGSPP_BK_LDLT_H
 
 #include <vector>
-#include <Rcpp.h>
-// #include <Eigen/Core>
-#include <RcppEigen.h>
-// [[Rcpp::depends(RcppEigen)]]
+#include <Eigen/Core>
 
 /// \cond
 

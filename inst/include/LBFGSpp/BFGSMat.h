@@ -5,9 +5,7 @@
 #define LBFGSPP_BFGS_MAT_H
 
 #include <vector>
-// #include <Eigen/Core>
-#include <RcppEigen.h>
-// [[Rcpp::depends(RcppEigen)]]
+#include <Eigen/Core>
 #include "BKLDLT.h"
 
 /// \cond
