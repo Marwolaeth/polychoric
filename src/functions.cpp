@@ -233,7 +233,6 @@ double Phi2(
     double e2 = 0.0,
     double s2 = 1.0
 ) {
-  double pi = std::atan(1) * 4; // calculate pi
   // if (s1 <= 0 || s2 <= 0) {
   //   Rcpp::stop("Standard deviation must be positive");
   // }
