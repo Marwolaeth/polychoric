@@ -15,7 +15,7 @@ LaTeX: pdfLaTeX
 BuildType: Package
 PackageUseDevtools: Yes
 PackageInstallArgs: --no-multiarch --with-keep.source
-PackageBuildArgs: -O3
-PackageBuildBinaryArgs: -O3
-PackageCheckArgs: -g -O3
+PackageBuildArgs: -O3 -ffast-math -funroll-loops
+PackageBuildBinaryArgs: -O3 -ffast-math -funroll-loops
+PackageCheckArgs: -g -O3 -ffast-math -funroll-loops
 PackageRoxygenize: rd,collate,namespace,vignette
