@@ -1,4 +1,5 @@
 useDynLib(polychoric, .registration = TRUE)
+export(polycorr)
 importFrom(Rcpp,sourceCpp)
 importFrom(Rcpp, evalCpp)
 ## export all regularly named functions

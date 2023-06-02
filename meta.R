@@ -12,15 +12,14 @@ available::available('polychoric') # Hey!
 # use_git()
 # use_github()
 
-load_all()
+pkgbuild::clean_dll()
+pkgload::load_all(compile = TRUE)
 
 check(document = TRUE, remote = TRUE, cran = TRUE)
 
 # use_mit_license()
 # use_data(gss12_values)
 # useDynLib(polychoric, .registration = TRUE)
-
-use_logo('polychoric.png')
 
 # use_readme_rmd()
 # build_readme()

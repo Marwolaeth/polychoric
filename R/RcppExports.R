@@ -2,26 +2,26 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 .poly_tab <- function(G, correct = 0.1) {
-    .Call('_polychoric_poly_tab', PACKAGE = 'polychoric', G, correct)
+    .Call(`_polychoric_poly_tab`, G, correct)
 }
 
 .poly_xy <- function(X, Y, correct = 0.1) {
-    .Call('_polychoric_poly_xy', PACKAGE = 'polychoric', X, Y, correct)
+    .Call(`_polychoric_poly_xy`, X, Y, correct)
 }
 
 .poly_df <- function(X, correct = 0.1) {
-    .Call('_polychoric_poly_df', PACKAGE = 'polychoric', X, correct)
+    .Call(`_polychoric_poly_df`, X, correct)
 }
 
 .poly_tab_full <- function(G, correct) {
-    .Call('_polychoric_poly_tab_full', PACKAGE = 'polychoric', G, correct)
+    .Call(`_polychoric_poly_tab_full`, G, correct)
 }
 
 .poly_xy_full <- function(x, y, correct = 0.1) {
-    .Call('_polychoric_poly_xy_full', PACKAGE = 'polychoric', x, y, correct)
+    .Call(`_polychoric_poly_xy_full`, x, y, correct)
 }
 
 .poly_df_full <- function(X, correct = 0.1) {
-    .Call('_polychoric_poly_df_full', PACKAGE = 'polychoric', X, correct)
+    .Call(`_polychoric_poly_df_full`, X, correct)
 }
 
