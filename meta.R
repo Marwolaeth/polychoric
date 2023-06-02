@@ -11,7 +11,6 @@ available::available('polychoric') # Hey!
 
 # use_git()
 # use_github()
-
 pkgbuild::clean_dll()
 pkgload::load_all(compile = TRUE)
 
