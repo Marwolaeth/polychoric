@@ -20,6 +20,12 @@ check(document = TRUE, remote = TRUE, cran = TRUE)
 
 # use_data(gss12_values)
 
+# useDynLib(polychoric, .registration = TRUE)
+
+use_logo('polychoric.png')
+use_github_action_check_standard()
+use_github_actions_badge()
+
 # use_readme_rmd()
 # build_readme()
 

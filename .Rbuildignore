@@ -7,3 +7,5 @@
 ^data-raw$
 ^README\.Rmd$
 ^.*.jpg$
+^.*.png$
+^\.github$
