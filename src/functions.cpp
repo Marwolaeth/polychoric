@@ -327,6 +327,7 @@ double contingency_table_loglik(const Eigen::MatrixXd& G, const Eigen::MatrixXd&
 }
 
 // Wrapper function to be used by the optimiser
+// [[Rcpp::export]]
 double polycor_objective(
     double rho,
     Eigen::VectorXd gamma,
@@ -341,6 +342,7 @@ double polycor_objective(
 }
 
 // Partial derivative of log likelihood w/ respect to rho
+// [[Rcpp::export]]
 double dl_drho(
     double rho,
     Eigen::VectorXd gamma,
@@ -383,6 +385,22 @@ double dl_drho(
   return -dl;
 }
 
+// Numerical partial derivative of log likelihood w/ respect to rho
+// [[Rcpp::export]]
+double autodiff(
+    double rho,
+    double val,
+    Eigen::VectorXd gamma,
+    Eigen::VectorXd tau,
+    Eigen::MatrixXd G,
+    const double& h = 0.000001
+) {
+  double rho2 = rho - h;
+  double dl = (val - polycor_objective(rho2, gamma, tau, G));
+  double dl_drho = dl / h;
+  return dl_drho;
+}
+
 // Function to estimate thresholds from an Eigen VectorXd object
 Eigen::VectorXd estimate_thresholds(
     const Eigen::VectorXd& X,
@@ -419,8 +437,8 @@ double poly_optim(Eigen::MatrixXd G, Eigen::VectorXd gamma, Eigen::VectorXd tau)
   auto objective = [&](const Eigen::VectorXd& x, Eigen::VectorXd& grad) -> double {
     double rho = x(0);
     double ll = 0.0;
-    grad[0] = dl_drho(rho, gamma, tau, G);
     ll = polycor_objective(rho, gamma, tau, G);
+    grad[0] = autodiff(rho, ll, gamma, tau, G);
     return ll;
   };
   
