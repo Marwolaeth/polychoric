@@ -10,16 +10,6 @@
 
 Fast Polychoric Correlation for Vectors and Data Frames
 
-## Installation
-
-You can install the development version of polychoric from
-[GitHub](https://github.com/) with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("Marwolaeth/polychoric")
-```
-
 ## About
 
 Polychoric is a package that provides a wrapper for C++ routines used to
@@ -37,6 +27,16 @@ Spoiler
 Pathetic amateurish craftsmanship
 
 </details>
+
+## Installation
+
+You can install the development version of polychoric from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("Marwolaeth/polychoric")
+```
 
 ## The Purpose
 
@@ -379,7 +379,7 @@ x <- rnorm(nrow(gss12_values))
 polycorr(gss12_values$valspl, x)
 #> Warning in .poly_xy(x, y, correct = correct): Too many levels or continuous
 #> input: returning Spearman's rho
-#> [1] 0.01700074
+#> [1] 0.008320878
 ```
 
 ### Handling missing values
@@ -409,61 +409,61 @@ mask <- matrix(
 gss_miss[!mask] <- NA
 summary(gss_miss)
 #>                valorig                  valrich                   valeql   
-#>  Not like me at all: 23   Not like me at all:181   Not like me at all: 14  
-#>  Not like me       : 53   Not like me       :454   Not like me       : 19  
-#>  A little like me  :115   A little like me  :215   A little like me  : 46  
-#>  Somewhat like me  :313   Somewhat like me  :156   Somewhat like me  :139  
-#>  Like me           :300   Like me           : 70   Like me           :345  
-#>  Very much like me :341   Very much like me : 59   Very much like me :555  
-#>  NA's              :110   NA's              :120   NA's              :137  
+#>  Not like me at all: 21   Not like me at all:178   Not like me at all: 11  
+#>  Not like me       : 54   Not like me       :455   Not like me       : 19  
+#>  A little like me  :111   A little like me  :229   A little like me  : 48  
+#>  Somewhat like me  :323   Somewhat like me  :150   Somewhat like me  :138  
+#>  Like me           :296   Like me           : 75   Like me           :353  
+#>  Very much like me :326   Very much like me : 55   Very much like me :563  
+#>  NA's              :124   NA's              :113   NA's              :123  
 #>                valable                  valsafe                  valdiff   
-#>  Not like me at all: 46   Not like me at all: 29   Not like me at all: 37  
-#>  Not like me       :188   Not like me       :121   Not like me       :132  
-#>  A little like me  :188   A little like me  :136   A little like me  :176  
-#>  Somewhat like me  :270   Somewhat like me  :214   Somewhat like me  :290  
-#>  Like me           :244   Like me           :315   Like me           :263  
-#>  Very much like me :174   Very much like me :318   Very much like me :217  
-#>  NA's              :145   NA's              :122   NA's              :140  
+#>  Not like me at all: 47   Not like me at all: 32   Not like me at all: 38  
+#>  Not like me       :185   Not like me       :120   Not like me       :131  
+#>  A little like me  :193   A little like me  :136   A little like me  :180  
+#>  Somewhat like me  :269   Somewhat like me  :223   Somewhat like me  :295  
+#>  Like me           :241   Like me           :327   Like me           :268  
+#>  Very much like me :182   Very much like me :310   Very much like me :228  
+#>  NA's              :138   NA's              :107   NA's              :115  
 #>                valrule                  vallist                   valmod   
-#>  Not like me at all: 66   Not like me at all: 12   Not like me at all: 18  
-#>  Not like me       :188   Not like me       : 29   Not like me       : 59  
-#>  A little like me  :169   A little like me  : 95   A little like me  :114  
-#>  Somewhat like me  :242   Somewhat like me  :211   Somewhat like me  :243  
-#>  Like me           :278   Like me           :457   Like me           :409  
-#>  Very much like me :186   Very much like me :340   Very much like me :277  
-#>  NA's              :126   NA's              :111   NA's              :135  
+#>  Not like me at all: 74   Not like me at all:  9   Not like me at all: 18  
+#>  Not like me       :194   Not like me       : 31   Not like me       : 61  
+#>  A little like me  :173   A little like me  : 92   A little like me  :116  
+#>  Somewhat like me  :240   Somewhat like me  :206   Somewhat like me  :249  
+#>  Like me           :281   Like me           :454   Like me           :403  
+#>  Very much like me :185   Very much like me :332   Very much like me :288  
+#>  NA's              :108   NA's              :131   NA's              :120  
 #>                 valspl                  valfree                  valcare   
-#>  Not like me at all: 77   Not like me at all:  9   Not like me at all:  6  
-#>  Not like me       :304   Not like me       : 40   Not like me       :  9  
-#>  A little like me  :236   A little like me  : 88   A little like me  : 65  
-#>  Somewhat like me  :251   Somewhat like me  :174   Somewhat like me  :201  
-#>  Like me           :174   Like me           :363   Like me           :413  
-#>  Very much like me :109   Very much like me :451   Very much like me :438  
-#>  NA's              :104   NA's              :130   NA's              :123  
+#>  Not like me at all: 74   Not like me at all:  9   Not like me at all:  7  
+#>  Not like me       :299   Not like me       : 42   Not like me       :  9  
+#>  A little like me  :227   A little like me  : 86   A little like me  : 66  
+#>  Somewhat like me  :249   Somewhat like me  :167   Somewhat like me  :201  
+#>  Like me           :175   Like me           :367   Like me           :409  
+#>  Very much like me :105   Very much like me :449   Very much like me :430  
+#>  NA's              :126   NA's              :135   NA's              :133  
 #>                valachv                  valdfnd                  valrisk   
-#>  Not like me at all: 54   Not like me at all: 30   Not like me at all: 83  
-#>  Not like me       :226   Not like me       :101   Not like me       :279  
-#>  A little like me  :209   A little like me  :121   A little like me  :190  
-#>  Somewhat like me  :267   Somewhat like me  :210   Somewhat like me  :286  
-#>  Like me           :223   Like me           :385   Like me           :183  
-#>  Very much like me :161   Very much like me :299   Very much like me :119  
-#>  NA's              :115   NA's              :109   NA's              :115  
+#>  Not like me at all: 52   Not like me at all: 26   Not like me at all: 88  
+#>  Not like me       :228   Not like me       : 97   Not like me       :271  
+#>  A little like me  :204   A little like me  :128   A little like me  :192  
+#>  Somewhat like me  :248   Somewhat like me  :205   Somewhat like me  :284  
+#>  Like me           :228   Like me           :381   Like me           :182  
+#>  Very much like me :156   Very much like me :296   Very much like me :118  
+#>  NA's              :139   NA's              :122   NA's              :120  
 #>                valprpr                  valrspt                  valdvot   
-#>  Not like me at all: 42   Not like me at all: 49   Not like me at all:  7  
-#>  Not like me       :146   Not like me       :272   Not like me       : 15  
-#>  A little like me  :179   A little like me  :197   A little like me  : 60  
-#>  Somewhat like me  :258   Somewhat like me  :325   Somewhat like me  :178  
-#>  Like me           :303   Like me           :197   Like me           :405  
-#>  Very much like me :220   Very much like me : 85   Very much like me :460  
-#>  NA's              :107   NA's              :130   NA's              :130  
+#>  Not like me at all: 41   Not like me at all: 57   Not like me at all:  4  
+#>  Not like me       :150   Not like me       :281   Not like me       : 15  
+#>  A little like me  :175   A little like me  :194   A little like me  : 55  
+#>  Somewhat like me  :259   Somewhat like me  :317   Somewhat like me  :183  
+#>  Like me           :301   Like me           :201   Like me           :407  
+#>  Very much like me :210   Very much like me : 76   Very much like me :463  
+#>  NA's              :119   NA's              :129   NA's              :128  
 #>                 valeco                  valtrdn                   valfun   
-#>  Not like me at all: 11   Not like me at all: 45   Not like me at all: 25  
-#>  Not like me       : 44   Not like me       :125   Not like me       :122  
-#>  A little like me  :130   A little like me  :162   A little like me  :235  
-#>  Somewhat like me  :241   Somewhat like me  :249   Somewhat like me  :280  
-#>  Like me           :378   Like me           :316   Like me           :286  
-#>  Very much like me :319   Very much like me :247   Very much like me :182  
-#>  NA's              :132   NA's              :111   NA's              :125
+#>  Not like me at all: 12   Not like me at all: 46   Not like me at all: 24  
+#>  Not like me       : 44   Not like me       :122   Not like me       :125  
+#>  A little like me  :136   A little like me  :157   A little like me  :234  
+#>  Somewhat like me  :247   Somewhat like me  :250   Somewhat like me  :281  
+#>  Like me           :379   Like me           :309   Like me           :283  
+#>  Very much like me :309   Very much like me :245   Very much like me :180  
+#>  NA's              :128   NA's              :126   NA's              :128
 ```
 
 Let’s rerun the estimation: the function works, though coefficients may
@@ -506,9 +506,9 @@ bm <- microbenchmark(
 )
 bm
 #> Unit: milliseconds
-#>     expr       min        lq      mean    median        uq       max neval cld
-#> standard 2550.1347 2602.4513 2643.0882 2633.6066 2686.4815 2796.6185    32  a 
-#> polycorr  200.1188  201.4409  207.8248  205.0461  207.4805  257.6068    32   b
+#>      expr       min        lq      mean    median        uq       max neval cld
+#>  standard 2400.2660 2429.9231 2459.2696 2453.3642 2489.8278 2542.8866    32  a 
+#>  polycorr  202.3439  204.5357  207.4094  206.5179  209.1801  219.9751    32   b
 ```
 
 ## Development

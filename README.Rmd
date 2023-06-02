@@ -21,15 +21,6 @@ knitr::opts_chunk$set(
 
 Fast Polychoric Correlation for Vectors and Data Frames
 
-## Installation
-
-You can install the development version of polychoric from [GitHub](https://github.com/) with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("Marwolaeth/polychoric")
-```
-
 ## About
 Polychoric is a package that provides a wrapper for C++ routines used to calculate polychoric correlation coefficients, which are often used in social science or marketing research. The single `polycorr()` function can take in ordinal factor vectors, a contingency table, or a data frame and returns corresponding polychoric correlation estimates in the form of a single numeric value or a correlation matrix.
 
@@ -39,6 +30,15 @@ Polychoric is a package that provides a wrapper for C++ routines used to calcula
   Pathetic amateurish craftsmanship
   
  </details>
+
+## Installation
+
+You can install the development version of polychoric from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("Marwolaeth/polychoric")
+```
   
 ## The Purpose
 Polychoric correlation coefficients are a type of correlation coefficient used to measure the relationship between two ordinal variables. They are computed by estimating the correlation between two underlying continuous variables that are assumed to give rise to the observed ordinal data. The `polycorr()` function estimates latent Pearson correlation coefficients under the assumption that the latent traits of interest are standard normal random variables.
