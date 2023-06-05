@@ -71,18 +71,6 @@ polycorr(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
 #### A contingency table ----
 (G <- table(gss12_values$valorig, gss12_values$valeql))
 polycorr(G)
-(rho2 <- polycorr(G))
-(corr <- psych::polychoric(G))
-(gamma <- corr$tau.row)
-(tau <- corr$tau.col)
-(rho <- corr$rho)
-(ll <- polycor_objective(rho, gamma, tau, G))
-dl_drho(rho, gamma, tau, G)
-autodiff(rho, ll, gamma, tau, G)
-
-(ll <- polycor_objective(rho2, gamma, tau, G))
-dl_drho(rho2, gamma, tau, G)
-autodiff(rho2, ll, gamma, tau, G)
 
 #### A data.frame ----
 polycorr(gss12_values)
