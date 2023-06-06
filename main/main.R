@@ -61,6 +61,25 @@ df$c1 <- rlnorm(n, 4, .4)
 head(df, 13)
 polycorr(df)
 
+## POLYSERIAL CORRELATION ----
+
+#### Create Dataset ----
+library(mvtnorm)
+(rho <- .77)    # True rho
+(s1 <- 11)      # True X standard deviation
+(sigma <- matrix(c(s1^2, s1*rho, s1*rho, 1), ncol = 2))
+df <- rmvnorm(200, mean = c(100, 0), sigma = sigma) |>
+  as.data.frame() |>
+  setNames(c('x', 'y'))
+head(df, 13)
+corr.test(df)
+df$c <- cut(df$x, breaks = 5, labels = likert5_lvls, ordered_result = TRUE)
+df$d <- cut(df$y, breaks = 5, labels = likert5_lvls, ordered_result = TRUE)
+summary(df)
+polychoric(table(df$c, df$d), correct = .1)
+polycorr(df$c, df$d)
+polyserial(df$y, df$c) # ???
+
 ## GSS 2012 SCHWARTZ VALUES MODULE ----
 data("gss12_values", package = 'polychoric')
 
