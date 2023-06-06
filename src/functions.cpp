@@ -252,13 +252,15 @@ double Phi2(
 // Polychoric correlation and thresholds as class to be returned
 class Polychoric {
 private:
-  // double rho;            // Polychoric correlation coefficient estimate
-  Eigen::VectorXd gamma;    // Thresholds for latent variable X
-  Eigen::VectorXd tau;      // Thresholds for latent variable Y
-  Eigen::VectorXd g;        // Augmented thresholds: –∞ · gamma · ∞
-  Eigen::VectorXd t;        // Augmented thresholds: –∞ · tau · ∞
-  // Eigen::MatrixXd pmf;   // Matrix of hypothesized probabilities
-  Eigen::MatrixXd G;        // (adjusted) Observed contingency table
+  // double rho;                  // Polychoric correlation coefficient estimate
+  // Eigen::VectorXd gamma;       // Thresholds for latent variable X
+  // Eigen::VectorXd tau;         // Thresholds for latent variable Y
+  Eigen::VectorXd g;              // Augmented thresholds: –∞ · gamma · ∞
+  Eigen::VectorXd t;              // Augmented thresholds: –∞ · tau · ∞
+  // Eigen::MatrixXd pmf;         // Matrix of hypothesized probabilities
+  const Eigen::MatrixXd G;        // (adjusted) Observed contingency table
+  int r;                          // # of rows
+  int s;                          // # of rows and columns
   
   // Probabilities of latent X and Y to fall into intervals formed by gamma and tau
   // Analogous to psych::polyBinBvn()
@@ -301,11 +303,7 @@ private:
       const Eigen::MatrixXd& P
   ) {
     // Compute log likelihood of contingency table G given matrix of probabilities P
-    int r = G.rows();
-    int s = G.cols();
-    // if (r != P.rows() || s != P.cols()) {
-    //   Rcpp::stop("Input matrices must have same dimensions");
-    // }
+
     double loglik = 0.0;
     for (int i = 0; i < r; i++) {
       for (int j = 0; j < s; j++) {
@@ -326,9 +324,6 @@ private:
       const Eigen::MatrixXd& G,
       const Eigen::MatrixXd& P
   ) {
-    int r = G.rows();
-    int s = G.cols();
-    
     // Compute the partial derivative of the log likelihood with respect to rho
     double dl = 0.0;
     for (int i = 1; i < r+1; i++) {
@@ -351,8 +346,8 @@ public:
     const Eigen::VectorXd& gamma,
     const Eigen::VectorXd& tau
   ) : G(G_) {
-    int r = G.rows();
-    int s = G.cols();
+    r = G.rows();
+    s = G.cols();
     
     // append large values to gamma and tau
     g = Eigen::VectorXd(r+1);

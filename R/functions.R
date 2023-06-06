@@ -5,7 +5,7 @@
 #' @param correct Correction value to use to correct for continuity in the case of zero entry cell of a contingency table. Can be used with any `x` input type.
 #' @param coef.only If `TRUE`, returns only correlation coefficients (see Value).
 #'
-#' @return Polychoric correlation coefficients: numeric of length one (for a pair of vectors or a contingency table) or an m×m correlation matrix (if `x` is a data.frame), where m is the number of items in the dataset. `coef.only=FALSE`, returns a list with (a matrix of) coefficients, a list of threshold estimates for every item used (length two for a pair of vectors or a table, length m for a data.frame) and (a matrix of) p-values of correlation coefficients.
+#' @return Polychoric correlation coefficients: numeric of length one (for a pair of vectors or a contingency table) or an m×m correlation matrix (if `x` is a data.frame), where m is the number of items in the dataset. `coef.only=FALSE`, returns a list with (a matrix of) coefficients, a list of threshold estimates for every item used (length two for a pair of vectors or a table, length m for a data.frame) and (a matrix of Bonferroni-adjusted) p-values of correlation coefficients.
 #' @export
 #'
 #' @details
@@ -64,6 +64,7 @@ polycorr <- function(
     correct = 0.1,
     coef.only = TRUE
 ) {
+  ## Case 1: two vectors
   if (!is.null(y)) {
     if (coef.only) {
       return(.poly_xy(x, y, correct = correct))
@@ -71,6 +72,7 @@ polycorr <- function(
       return(.poly_xy_full(x, y, correct = correct))
     }
   }
+  ## Case 2: a contingency table
   if (is.matrix(x)) {
     if (coef.only) {
       return(.poly_tab(x, correct = correct))
@@ -78,6 +80,7 @@ polycorr <- function(
       return(.poly_tab_full(x, correct = correct))
     }
   }
+  ## Case 3: a data.frame
   items <- names(x)
   if (coef.only) {
     rho <- .poly_df(x, correct = correct)
