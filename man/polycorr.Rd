@@ -16,7 +16,7 @@ polycorr(x, y = NULL, correct = 0.1, coef.only = TRUE)
 \item{coef.only}{If `TRUE`, returns only correlation coefficients (see Value).}
 }
 \value{
-Polychoric correlation coefficients: numeric of length one (for a pair of vectors or a contingency table) or an m×m correlation matrix (if `x` is a data.frame), where m is the number of items in the dataset. `coef.only=FALSE`, returns a list with (a matrix of) coefficients, a list of threshold estimates for every item used (length two for a pair of vectors or a table, length m for a data.frame) and (a matrix of) p-values of correlation coefficients.
+Polychoric correlation coefficients: numeric of length one (for a pair of vectors or a contingency table) or an m×m correlation matrix (if `x` is a data.frame), where m is the number of items in the dataset. `coef.only=FALSE`, returns a list with (a matrix of) coefficients, a list of threshold estimates for every item used (length two for a pair of vectors or a table, length m for a data.frame) and (a matrix of Bonferroni-adjusted) p-values of correlation coefficients.
 }
 \description{
 Estimate polychoric correlation coefficients

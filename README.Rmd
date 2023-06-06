@@ -208,9 +208,8 @@ Please report any issues you came up with on the [issues](https://github.com/Mar
 <details>
   <summary>The upcoming steps</summary>
   
-  1. Optimise `Polychoric` class in the source code.
-  2. Provide a polyserial correlation estimation function.
-  3. Implement (optional) more robust distributional assumptions, e.g. a skew normal distribution (*Jin and Yang-Wallentin 2017*).
+  1. Provide a polyserial correlation estimation function.
+  2. Implement (optional) more robust distributional assumptions, e.g. a skew normal distribution (*Jin and Yang-Wallentin 2017*).
  </details>
 
 ## References
