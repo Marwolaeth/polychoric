@@ -25,7 +25,7 @@ template <typename Scalar>
 class LineSearchMoreThuente
 {
 private:
-    typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> Vector;
+    using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
 
     // Minimizer of a quadratic function q(x) = c0 + c1 * x + c2 * x^2
     // that interpolates fa, ga, and fb, assuming the minimizer exists
@@ -66,7 +66,7 @@ private:
         const Scalar z3 = (ga + gb) * ba - Scalar(2) * fba;
         const Scalar z2 = Scalar(0.5) * (gba * ba2 - Scalar(3) * apb * z3);
         const Scalar z1 = fba * ba2 - apb * z2 - (a * apb + b * b) * z3;
-
+        // std::cout << "z1 = " << z1 << ", z2 = " << z2 << ", z3 = " << z3 << std::endl;
 
         // If c3 = z/(b-a)^3 == 0, reduce to quadratic problem
         const Scalar eps = std::numeric_limits<Scalar>::epsilon();
@@ -133,10 +133,10 @@ private:
         // ac: cubic interpolation of fl, ft, gl, gt
         // aq: quadratic interpolation of fl, gl, ft
         bool ac_exists;
-
+        // std::cout << "al = " << al << ", at = " << at << ", fl = " << fl << ", ft = " << ft << ", gl = " << gl << ", gt = " << gt << std::endl;
         const Scalar ac = cubic_minimizer(al, at, fl, ft, gl, gt, ac_exists);
         const Scalar aq = quadratic_minimizer(al, at, fl, gl, ft);
-
+        // std::cout << "ac = " << ac << ", aq = " << aq << std::endl;
         // Case 1: ft > fl
         if (ft > fl)
         {
@@ -215,7 +215,7 @@ public:
                            Scalar& step, Scalar& fx, Vector& grad, Scalar& dg, Vector& x)
     {
         using std::abs;
-
+        // std::cout << "========================= Entering line search =========================\n\n";
 
         // Check the value of step
         if (step <= Scalar(0))
@@ -228,7 +228,7 @@ public:
         // Projection of gradient on the search direction
         const Scalar dg_init = dg;
 
-
+        // std::cout << "fx_init = " << fx_init << ", dg_init = " << dg_init << std::endl << std::endl;
 
         // Make sure d points to a descent direction
         if (dg_init >= Scalar(0))
@@ -244,19 +244,23 @@ public:
         Scalar I_lo = Scalar(0), I_hi = std::numeric_limits<Scalar>::infinity();
         Scalar fI_lo = Scalar(0), fI_hi = std::numeric_limits<Scalar>::infinity();
         Scalar gI_lo = (Scalar(1) - param.ftol) * dg_init, gI_hi = std::numeric_limits<Scalar>::infinity();
+        // We also need to save x and grad for step=I_lo, since we want to return the best
+        // step size along the path when strong Wolfe condition is not met
+        Vector x_lo = xp, grad_lo = grad;
+        Scalar fx_lo = fx_init, dg_lo = dg_init;
 
         // Function value and gradient at the current step size
         x.noalias() = xp + step * drt;
         fx = f(x, grad);
         dg = grad.dot(drt);
 
-
+        // std::cout << "max_step = " << step_max << ", step = " << step << ", fx = " << fx << ", dg = " << dg << std::endl;
 
         // Convergence test
         if (fx <= fx_init + step * test_decr && abs(dg) <= test_curv)
         {
-
-
+            // std::cout << "** Criteria met\n\n";
+            // std::cout << "========================= Leaving line search =========================\n\n";
             return;
         }
 
@@ -286,7 +290,7 @@ public:
                 fI_hi = ft;
                 gI_hi = gt;
 
-
+                // std::cout << "Case 1: new step = " << new_step << std::endl;
             }
             else if (gt * (I_lo - step) > Scalar(0))
             {
@@ -310,8 +314,13 @@ public:
                 I_lo = step;
                 fI_lo = ft;
                 gI_lo = gt;
+                // Move x and grad to x_lo and grad_lo, respectively
+                x_lo.swap(x);
+                grad_lo.swap(grad);
+                fx_lo = fx;
+                dg_lo = dg;
 
-
+                // std::cout << "Case 2: new step = " << new_step << std::endl;
             }
             else
             {
@@ -325,8 +334,13 @@ public:
                 I_lo = step;
                 fI_lo = ft;
                 gI_lo = gt;
+                // Move x and grad to x_lo and grad_lo, respectively
+                x_lo.swap(x);
+                grad_lo.swap(grad);
+                fx_lo = fx;
+                dg_lo = dg;
 
-
+                // std::cout << "Case 3: new step = " << new_step << std::endl;
             }
 
             // Case 1 and 3 are interpolations, whereas Case 2 is extrapolation
@@ -340,8 +354,12 @@ public:
             // In case step, new_step, and step_max are equal, directly return the computed x and fx
             if (step == step_max && new_step >= step_max)
             {
+                // std::cout << "** Maximum step size reached\n\n";
+                // std::cout << "========================= Leaving line search =========================\n\n";
 
-
+                // Move {x, grad}_lo back before returning
+                x.swap(x_lo);
+                grad.swap(grad_lo);
                 return;
             }
             // Otherwise, recompute x and fx based on new_step
@@ -358,13 +376,13 @@ public:
             fx = f(x, grad);
             dg = grad.dot(drt);
 
-
+            // std::cout << "step = " << step << ", fx = " << fx << ", dg = " << dg << std::endl;
 
             // Convergence test
             if (fx <= fx_init + step * test_decr && abs(dg) <= test_curv)
             {
-
-
+                // std::cout << "** Criteria met\n\n";
+                // std::cout << "========================= Leaving line search =========================\n\n";
                 return;
             }
 
@@ -384,15 +402,39 @@ public:
                 const Scalar ft = fx - fx_init - step * test_decr;
                 if (ft <= fI_lo)
                 {
-
-
+                    // std::cout << "** Maximum step size reached\n\n";
+                    // std::cout << "========================= Leaving line search =========================\n\n";
                     return;
                 }
             }
         }
 
+        // If we have used up all line search iterations, then the strong Wolfe condition
+        // is not met. We choose not to raise an exception (unless no step satisfying
+        // sufficient decrease is found), but to return the best step size so far
         if (iter >= param.max_linesearch)
-            Rcpp::stop("the line search routine reached the maximum number of iterations");
+        {
+            // throw std::runtime_error("the line search routine reached the maximum number of iterations");
+
+            // First test whether the last step is better than I_lo
+            // If yes, return the last step
+            const Scalar ft = fx - fx_init - step * test_decr;
+            if (ft <= fI_lo)
+                return;
+
+            // Then the best step size so far is I_lo, but it needs to be positive
+            if (I_lo <= Scalar(0))
+                Rcpp::stop("the line search routine is unable to sufficiently decrease the function value");
+
+            // Return everything with _lo
+            step = I_lo;
+            fx = fx_lo;
+            dg = dg_lo;
+            // Move {x, grad}_lo back
+            x.swap(x_lo);
+            grad.swap(grad_lo);
+            return;
+        }
     }
 };
 

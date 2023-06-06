@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <Eigen/Core>
+#include <Rcpp.h>
 #include "LBFGSpp/Param.h"
 #include "LBFGSpp/BFGSMat.h"
 #include "LBFGSpp/Cauchy.h"
@@ -22,10 +23,10 @@ template <typename Scalar,
 class LBFGSBSolver
 {
 private:
-    typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> Vector;
-    typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> Matrix;
-    typedef Eigen::Map<Vector> MapVec;
-    typedef std::vector<int> IndexSet;
+    using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
+    using Matrix = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
+    using MapVec = Eigen::Map<Vector>;
+    using IndexSet = std::vector<int>;
 
     const LBFGSBParam<Scalar>& m_param;  // Parameters to control the LBFGS algorithm
     BFGSMat<Scalar, true> m_bfgs;        // Approximation to the Hessian matrix
@@ -138,8 +139,8 @@ public:
         if (fpast > 0)
             m_fx[0] = fx;
 
-
-
+        // std::cout << "x0 = " << x.transpose() << std::endl;
+        // std::cout << "f(x0) = " << fx << ", ||proj_grad|| = " << m_projgnorm << std::endl << std::endl;
 
         // Early exit if the initial x is already a minimizer
         if (m_projgnorm <= m_param.epsilon || m_projgnorm <= m_param.epsilon_rel * x.norm())
@@ -154,13 +155,15 @@ public:
 
         /* Vector gcp(n);
         Scalar fcp = f(xcp, gcp);
-        Scalar projgcpnorm = proj_grad_norm(xcp, gcp, lb, ub);*/
+        Scalar projgcpnorm = proj_grad_norm(xcp, gcp, lb, ub);
+        std::cout << "xcp = " << xcp.transpose() << std::endl;
+        std::cout << "f(xcp) = " << fcp << ", ||proj_grad|| = " << projgcpnorm << std::endl << std::endl; */
 
         // Initial direction
         m_drt.noalias() = xcp - x;
         m_drt.normalize();
         // Tolerance for s'y >= eps * (y'y)
-        const Scalar eps = std::numeric_limits<Scalar>::epsilon();
+        constexpr Scalar eps = std::numeric_limits<Scalar>::epsilon();
         // s and y vectors
         Vector vecs(n), vecy(n);
         // Number of iterations used
@@ -202,6 +205,10 @@ public:
             // New projected gradient norm
             m_projgnorm = proj_grad_norm(x, m_grad, lb, ub);
 
+            /* std::cout << "** Iteration " << k << std::endl;
+            std::cout << "   x = " << x.transpose() << std::endl;
+            std::cout << "   f(x) = " << fx << ", ||proj_grad|| = " << m_projgnorm << std::endl << std::endl; */
+
             // Convergence test -- gradient
             if (m_projgnorm <= m_param.epsilon || m_projgnorm <= m_param.epsilon_rel * x.norm())
             {
@@ -235,14 +242,18 @@ public:
 
             /*Vector gcp(n);
             Scalar fcp = f(xcp, gcp);
-            Scalar projgcpnorm = proj_grad_norm(xcp, gcp, lb, ub);*/
+            Scalar projgcpnorm = proj_grad_norm(xcp, gcp, lb, ub);
+            std::cout << "xcp = " << xcp.transpose() << std::endl;
+            std::cout << "f(xcp) = " << fcp << ", ||proj_grad|| = " << projgcpnorm << std::endl << std::endl;*/
 
             SubspaceMin<Scalar>::subspace_minimize(m_bfgs, x, xcp, m_grad, lb, ub,
                                                    vecc, newact_set, fv_set, m_param.max_submin, m_drt);
 
             /*Vector gsm(n);
             Scalar fsm = f(x + m_drt, gsm);
-            Scalar projgsmnorm = proj_grad_norm(x + m_drt, gsm, lb, ub);*/
+            Scalar projgsmnorm = proj_grad_norm(x + m_drt, gsm, lb, ub);
+            std::cout << "xsm = " << (x + m_drt).transpose() << std::endl;
+            std::cout << "f(xsm) = " << fsm << ", ||proj_grad|| = " << projgsmnorm << std::endl << std::endl;*/
 
             k++;
         }
