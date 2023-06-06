@@ -768,12 +768,13 @@ Rcpp::List poly_xy_full(
 Rcpp::List poly_df_full(Rcpp::List X, double correct = 0.1) {
   int m = X.size();                           // number of items
   int N = ((Rcpp::IntegerVector)X[0]).size(); // number of respondents
+  int nc = (m * (m-1)) / 2;                   // number of correlations
   
   // Create correlation matrix template
   Eigen::MatrixXd Corr = Eigen::MatrixXd::Ones(m, m);
   Eigen::VectorXd x(N), y(N), gamma, tau;
   // Create p-value matrix template
-  Eigen::MatrixXd Pval = Eigen::MatrixXd::Constant(m, m, 2e-16);
+  Eigen::MatrixXd Pval = Eigen::MatrixXd::Constant(m, m, 2e-16*nc);
   // Create empty lists to store items and their thresholds
   Rcpp::List items(m);
   Rcpp::List thresholds(m);
@@ -819,6 +820,8 @@ Rcpp::List poly_df_full(Rcpp::List X, double correct = 0.1) {
       Corr(j,i) = rho;
       // Calculate p-value
       double pval = poly_pval(rho, xc.size());
+      // Correct p-value (Bonferroni)
+      pval = std::min(1.0, pval*nc);
       Pval(i,j) = pval;
       Pval(j,i) = pval;
     }
