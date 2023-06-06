@@ -24,3 +24,4 @@ check(document = TRUE, remote = TRUE, cran = TRUE)
 # build_readme()
 
 install()
+pkgbuild::build(compile_attributes = TRUE, args = '-O3')
