@@ -818,8 +818,9 @@ Rcpp::List poly_df_full(Rcpp::List X, double correct = 0.1) {
       }
       Corr(i,j) = rho;
       Corr(j,i) = rho;
-      // Calculate p-value
+      // Calculate p-value, not allowing zeros
       double pval = poly_pval(rho, xc.size());
+      pval = std::max(2e-16, pval);
       // Correct p-value (Bonferroni)
       pval = std::min(1.0, pval*nc);
       Pval(i,j) = pval;
