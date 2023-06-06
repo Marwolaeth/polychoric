@@ -8,6 +8,8 @@
 #include <numeric>
 #include <vector>
 #include <unordered_set>
+// #include <chrono>
+// #include <ctime>
 #include "toms462.cpp"
 #include "LBFGSB.h"
 
@@ -451,7 +453,7 @@ double poly_optim(
   
   // Set the optimization parameters
   LBFGSpp::LBFGSBParam<double> params;
-  params.max_iterations = 111;
+  params.max_iterations = 20;
   // params.max_linesearch = 99;
   params.epsilon = 1e-9;
   params.delta = 1e-9;
@@ -557,25 +559,46 @@ double poly_xy(
     double correct = 0.1
 ) {
   // Filter for pairwise complete observations
+  // auto start = std::chrono::system_clock::now(); // TIME IT
   Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, Y);
   Eigen::VectorXd x = filter(X, pco);
   Eigen::VectorXd y = filter(Y, pco);
+  // auto end = std::chrono::system_clock::now(); // TIME IT
+  // std::chrono::duration<double> elapsed_seconds = end-start;
+  // Rcpp::Rcout << "Filtering:              " << elapsed_seconds.count() << "s" << std::endl;
   
   // Check if variables are discrete with reasonable number of levels
+  // start = std::chrono::system_clock::now(); // TIME IT
   if ((n_unique(x) > 10) || (n_unique(y) > 10)) {
     Rcpp::warning(
       "Too many levels or continuous input: returning Spearman's rho"
     );
     return(cor_spearman(x, y));
   }
+  // end = std::chrono::system_clock::now(); // TIME IT
+  // elapsed_seconds = end-start;
+  // Rcpp::Rcout << "Checking descreteness:  " << elapsed_seconds.count() << "s" << std::endl;
   
   // Check if data types are polychoric-friendly
+  // start = std::chrono::system_clock::now(); // TIME IT
   x = correct_data(x);
   y = correct_data(y);
+  // end = std::chrono::system_clock::now(); // TIME IT
+  // elapsed_seconds = end-start;
+  // Rcpp::Rcout << "Correcting values:      " << elapsed_seconds.count() << "s" << std::endl;
   
   // Construct a contingency table
+  // start = std::chrono::system_clock::now(); // TIME IT
   Eigen::MatrixXd G = contingency_table(x, y);
+  // end = std::chrono::system_clock::now(); // TIME IT
+  // elapsed_seconds = end-start;
+  // Rcpp::Rcout << "Constructing table:     " << elapsed_seconds.count() << "s" << std::endl;
   // Use the function for a table
+  // start = std::chrono::system_clock::now(); // TIME IT
+  // double rho = poly_tab(G, correct);
+  // end = std::chrono::system_clock::now(); // TIME IT
+  // elapsed_seconds = end-start;
+  // Rcpp::Rcout << "Estimating coefficient: " << elapsed_seconds.count() << "s" << std::endl;
   return poly_tab(G, correct);
 }
 

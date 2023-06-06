@@ -95,7 +95,15 @@ gc()
 
 bm <- microbenchmark(
   standard = polychoric(gss_num),
-  polycorr = polycorr(gss12_values),
+  polycorr = polycorr(gss12_values, coef.only = FALSE),
+  times = 32L,
+  control = list(warmup = 6)
+)
+bm
+
+bm <- microbenchmark(
+  standard = polychoric(table(gss12_values$valorig, gss12_values$valeql)),
+  polycorr = polycorr(gss12_values$valorig, gss12_values$valeql),
   times = 32L,
   control = list(warmup = 6)
 )
