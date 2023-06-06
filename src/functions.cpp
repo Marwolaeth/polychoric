@@ -15,8 +15,6 @@
 #include "toms462.cpp"
 #include "LBFGSB.h"
 
-Eigen::setNbThreads(Eigen::nbThreads() - 1);
-
 /*
  TOMS462 is a C++ library which evaluates the upper right tail of the bivariate
  normal distribution; that is, the probability that normal variables
