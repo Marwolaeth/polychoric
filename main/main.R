@@ -78,7 +78,8 @@ df$d <- cut(df$y, breaks = 5, labels = likert5_lvls, ordered_result = TRUE)
 summary(df)
 polychoric(table(df$c, df$d), correct = .1)
 polycorr(df$c, df$d)
-polyserial(df$y, df$c) # ???
+polyserial(df$y, df[,3:4] |> lapply(as.integer) |> as.data.frame())
+polycorr(df$y, df$c)
 
 ## GSS 2012 SCHWARTZ VALUES MODULE ----
 data("gss12_values", package = 'polychoric')

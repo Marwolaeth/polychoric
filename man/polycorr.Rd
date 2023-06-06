@@ -4,7 +4,7 @@
 \alias{polycorr}
 \title{Estimate polychoric correlation coefficients}
 \usage{
-polycorr(x, y = NULL, correct = 0.1, coef.only = TRUE)
+polycorr(x, y = NULL, correct = 1e-08, coef.only = TRUE)
 }
 \arguments{
 \item{x}{A vector of discrete scores: ordinal or integer, a contingency table or a data.frame (or a tibble) of discrete scores.}
