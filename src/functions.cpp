@@ -57,13 +57,16 @@
  Volume 27, Number 4, pages 1075-1090, December 1956.
  */
 
+const double pi = 3.1415926535; // set pi
+
 Eigen::Array<bool, Eigen::Dynamic, 1> is_na(const Eigen::VectorXd& x) {
   return x.array().isNaN();
 }
 
 // Find pairwise complete observations for two vectors
 Eigen::Array<bool, Eigen::Dynamic, 1> pairwise_complete(
-    const Eigen::VectorXd& x, const Eigen::VectorXd& y
+    const Eigen::VectorXd& x,
+    const Eigen::VectorXd& y
 ) {
   Eigen::Array<bool, Eigen::Dynamic, 1> miss_x = x.array().isNaN();
   Eigen::Array<bool, Eigen::Dynamic, 1> miss_y = y.array().isNaN();
@@ -71,7 +74,10 @@ Eigen::Array<bool, Eigen::Dynamic, 1> pairwise_complete(
 }
 
 // Filter vector based on the boolean mask
-Eigen::VectorXd filter(const Eigen::VectorXd& x, const Eigen::Array<bool, Eigen::Dynamic, 1>& mask) {
+Eigen::VectorXd filter(
+    const Eigen::VectorXd& x,
+    const Eigen::Array<bool, Eigen::Dynamic, 1>& mask
+) {
   // Vreate empty vector to store selected values
   Eigen::VectorXd xc = {};
   
@@ -159,13 +165,13 @@ Eigen::VectorXd correct_data(Eigen::VectorXd x) {
   return x;
 }
 
-double Phi(double x, double e = 0.0, double s = 1.0) {
+double Phi(const double& x, const double& e = 0.0, const double& s = 1.0) {
   double z = (x - e) / (s * std::sqrt(2)); // calculate z-score
   double cdf = 0.5 * (1 + std::erf(z)); // calculate CDF using erf function
   return cdf; // return CDF value
 }
 
-double Phi_inv(double p, double e = 0.0, double s = 1.0) {
+double Phi_inv(const double& p, const double& e = 0.0, const double& s = 1.0) {
   // check for valid input probability
   // if (p < 0.0 || p > 1.0) {
   //   Rcpp::stop("Invalid input probability");
@@ -188,8 +194,8 @@ double Phi_inv(double p, double e = 0.0, double s = 1.0) {
 
 Eigen::VectorXd Phi_inv_vec(
     const Eigen::VectorXd& p,
-    double e = 0.0,
-    double s = 1.0
+    const double& e = 0.0,
+    const double& s = 1.0
 ) {
   // check for valid input standard deviations
   // if (s <= 0) {
@@ -204,15 +210,14 @@ Eigen::VectorXd Phi_inv_vec(
 }
 
 double phi2(
-    double x,
-    double y,
-    double r = 0.0,
-    double e1 = 0.0,
-    double s1 = 1.0,
-    double e2 = 0.0,
-    double s2 = 1.0
+    const double& x,
+    const double& y,
+    const double& r = 0.0,
+    const double& e1 = 0.0,
+    const double& s1 = 1.0,
+    const double& e2 = 0.0,
+    const double& s2 = 1.0
 ) {
-  double pi = std::atan(1) * 4; // calculate pi
   // if (s1 <= 0 || s2 <= 0) {
   //   Rcpp::stop("Standard deviation must be positive");
   // }
@@ -225,13 +230,13 @@ double phi2(
 }
 
 double Phi2(
-    double x,
-    double y,
-    double r = 0.0,
-    double e1 = 0.0,
-    double s1 = 1.0,
-    double e2 = 0.0,
-    double s2 = 1.0
+    const double& x,
+    const double& y,
+    const double& r = 0.0,
+    const double& e1 = 0.0,
+    const double& s1 = 1.0,
+    const double& e2 = 0.0,
+    const double& s2 = 1.0
 ) {
   // if (s1 <= 0 || s2 <= 0) {
   //   Rcpp::stop("Standard deviation must be positive");
@@ -242,151 +247,143 @@ double Phi2(
   return cdf; // return PDF value
 }
 
-// Probabilities of latent X and Y to fall into intervals formed by gamma and tau
-// Analogous to psych::polyBinBvn()
-Eigen::MatrixXd grid_discretised_normal_pmf(
-    const Eigen::VectorXd& X,
-    const Eigen::VectorXd& Y,
-    double r = 0.0,
-    double e1 = 0.0,
-    double s1 = 1.0,
-    double e2 = 0.0,
-    double s2 = 1.0
-) {
-  int n = X.size();
-  int m = Y.size();
-  // if (s1 <= 0 || s2 <= 0) {
-  //   Rcpp::stop("Standard deviation must be positive");
-  // }
-  // append large values to X and Y
-  Eigen::VectorXd Xa(n+1);
-  for (int i = 0; i < n; i++) {
-    Xa(i) = X(i);
-  }
-  Eigen::VectorXd Ya(m+1);
-  for (int i = 0; i < m; i++) {
-    Ya(i) = Y(i);
-  }
-  Xa(n) = 1e9;
-  Ya(m) = 1e9;
-  // create matrix to store CDF values
-  Eigen::MatrixXd P(n+2, m+2);
-  for (int i = 0; i < n+2; i++) {
-    if (i == 0) {
-      for (int j = 0; j < m+2; j++) {
-        P(i, j) = 0.0;
+// Polychoric correlation and thresholds as class to be returned
+class Polychoric {
+private:
+  // double rho;            // Polychoric correlation coefficient estimate
+  Eigen::VectorXd gamma;    // Thresholds for latent variable X
+  Eigen::VectorXd tau;      // Thresholds for latent variable Y
+  Eigen::VectorXd g;        // Augmented thresholds: –∞ · gamma · ∞
+  Eigen::VectorXd t;        // Augmented thresholds: –∞ · tau · ∞
+  // Eigen::MatrixXd pmf;   // Matrix of hypothesized probabilities
+  Eigen::MatrixXd G;        // (adjusted) Observed contingency table
+  
+  // Probabilities of latent X and Y to fall into intervals formed by gamma and tau
+  // Analogous to psych::polyBinBvn()
+  Eigen::MatrixXd grid_discretised_normal_pmf(
+      const Eigen::VectorXd& X,
+      const Eigen::VectorXd& Y,
+      const double& r = 0.0
+  ) {
+    int n = X.size() - 2;
+    int m = Y.size() - 2;
+    // if (s1 <= 0 || s2 <= 0) {
+    //   Rcpp::stop("Standard deviation must be positive");
+    // }
+    
+    // create matrix to store CDF values
+    Eigen::MatrixXd P = Eigen::MatrixXd::Zero(n+2, m+2);
+    for (int i = 1; i < n+2; i++) {
+      double z1 = X(i);
+      for (int j = 1; j < m+2; j++) {
+        double z2 = Y(j);
+        double cdf = bivnor(-z1, -z2, r);
+        P(i, j) = cdf; // store CDF value in matrix
       }
-      continue;
     }
-    double x = Xa(i-1);
-    double z1 = (x - e1) / s1; // calculate standardized value of x
-    for (int j = 0; j < m+2; j++) {
-      if (j == 0) {
-        for (int i = 0; i < n+2; i++) {
-          P(i, j) = 0.0;
+    P(n+1, m+1) = 1.0;
+    // return P;
+    Eigen::MatrixXd pmf_matrix(n+1, m+1);
+    for (int i = 1; i < n+2; i++) {
+      for (int j = 1; j < m+2; j++) {
+        // Calculate P((x_i-1 < X < x_i) & (y_j-1 < Y < y_j))
+        pmf_matrix(i-1, j-1) = (P(i, j) - P(i-1, j)) - (P(i, j-1) - P(i-1, j-1));
+      }
+    }
+    return pmf_matrix; // return matrix of probabilities
+  }
+  
+  // Log likelihood given true contingency table and hypothesised probabilities
+  double contingency_table_loglik(
+      const Eigen::MatrixXd& G,
+      const Eigen::MatrixXd& P
+  ) {
+    // Compute log likelihood of contingency table G given matrix of probabilities P
+    int r = G.rows();
+    int s = G.cols();
+    // if (r != P.rows() || s != P.cols()) {
+    //   Rcpp::stop("Input matrices must have same dimensions");
+    // }
+    double loglik = 0.0;
+    for (int i = 0; i < r; i++) {
+      for (int j = 0; j < s; j++) {
+        if (P(i, j) > 0.0) {
+          // adjust value for the logarithm to be finite
+          loglik += G(i, j) * std::log(P(i, j));
         }
-        continue;
-      }
-      double y = Ya(j-1);
-      double z2 = (y - e2) / s2; // calculate standardized value of y
-      double cdf = bivnor(-z1, -z2, r);
-      P(i, j) = cdf; // store CDF value in matrix
-    }
-  }
-  P(n+1, m+1) = 1.0;
-  // return P;
-  Eigen::MatrixXd pmf_matrix(n+1, m+1);
-  for (int i = 1; i < n+2; i++) {
-    for (int j = 1; j < m+2; j++) {
-      // Calculate P((x_i-1 < X < x_i) & (y_j-1 < Y < y_j))
-      pmf_matrix(i-1, j-1) = (P(i, j) - P(i-1, j)) - (P(i, j-1) - P(i-1, j-1));
-    }
-  }
-  return pmf_matrix; // return matrix of probabilities
-}
-
-// Log likelihood given true contingency table and hypothesised probabilities
-double contingency_table_loglik(const Eigen::MatrixXd& G, const Eigen::MatrixXd& P) {
-  // Compute log likelihood of contingency table G given matrix of probabilities P
-  int r = G.rows();
-  int s = G.cols();
-  // if (r != P.rows() || s != P.cols()) {
-  //   Rcpp::stop("Input matrices must have same dimensions");
-  // }
-  double loglik = 0.0;
-  for (int i = 0; i < r; i++) {
-    for (int j = 0; j < s; j++) {
-      if (G(i, j) > 0.0 and P(i, j) > 0.0) {
-        // adjust value for the logarithm to be finite
-        loglik += G(i, j) * std::log(P(i, j));
       }
     }
+    return -loglik;
   }
-  return loglik;
-}
-
-// Wrapper function to be used by the optimiser
-double polycor_objective(
-    double rho,
-    Eigen::VectorXd gamma,
-    Eigen::VectorXd tau,
-    Eigen::MatrixXd G
-) {
-  // Calculate probabilities
-  Eigen::MatrixXd p = grid_discretised_normal_pmf(gamma, tau, rho);
-  // Calculate Log Likelihood
-  double ll = contingency_table_loglik(G, p);
-  return -ll;
-}
-
-// Partial derivative of log likelihood w/ respect to rho
-double dl_drho(
-    double rho,
-    Eigen::VectorXd gamma,
-    Eigen::VectorXd tau,
-    Eigen::MatrixXd G
-) {
-  int r = G.rows();
-  int s = G.cols();
   
-  // Compute the joint probability table P
-  Eigen::MatrixXd P = grid_discretised_normal_pmf(gamma, tau, rho);
-  
-  // append large values to gamma and tau
-  Eigen::VectorXd g(r+1);
-  g(0) = -1e9;
-  for (int i = 1; i < r; i++) {
-    g(i) = gamma(i-1);
-  }
-  g(r) = 1e9;
-  
-  Eigen::VectorXd t(s+1);
-  t(0) = -1e9;
-  for (int j = 1; j < s; j++) {
-    t(j) = tau(j-1);
-  }
-  t(s) = 1e9;
-  
-  // Compute the partial derivative of the log likelihood with respect to rho
-  double dl = 0.0;
-  for (int i = 1; i < r+1; i++) {
-    for (int j = 1; j < s+1; j++) {
-      if (P(i-1,j-1) > 0.0) {
-        double dphi1 = phi2(g(i), t(j), rho) - phi2(g(i-1), t(j), rho);
-        double dphi2 = phi2(g(i), t(j-1), rho) - phi2(g(i-1), t(j-1), rho);
-        double m = G(i-1,j-1)/(P(i-1, j-1)) * (dphi1 - dphi2);
-        dl += m;
+  // Partial derivative of log likelihood w/ respect to rho
+  double dl_drho(
+      const double& rho,
+      const Eigen::VectorXd& gamma,
+      const Eigen::VectorXd& tau,
+      const Eigen::MatrixXd& G,
+      const Eigen::MatrixXd& P
+  ) {
+    int r = G.rows();
+    int s = G.cols();
+    
+    // Compute the partial derivative of the log likelihood with respect to rho
+    double dl = 0.0;
+    for (int i = 1; i < r+1; i++) {
+      for (int j = 1; j < s+1; j++) {
+        if (P(i-1,j-1) > 0.0) {
+          double dphi1 = phi2(g(i), t(j), rho) - phi2(g(i-1), t(j), rho);
+          double dphi2 = phi2(g(i), t(j-1), rho) - phi2(g(i-1), t(j-1), rho);
+          double m = G(i-1,j-1)/(P(i-1, j-1)) * (dphi1 - dphi2);
+          dl += m;
+        }
       }
     }
+    return -dl;
   }
-  return -dl;
-}
+  
+public:
+  // Define constructor
+  Polychoric(
+    const Eigen::MatrixXd& G_,
+    const Eigen::VectorXd& gamma,
+    const Eigen::VectorXd& tau
+  ) : G(G_) {
+    int r = G.rows();
+    int s = G.cols();
+    
+    // append large values to gamma and tau
+    g = Eigen::VectorXd(r+1);
+    g(0) = -1e9;
+    for (int i = 1; i < r; i++) {
+      g(i) = gamma(i-1);
+    }
+    g(r) = 1e9;
+    
+    t = Eigen::VectorXd(s+1);
+    t(0) = -1e9;
+    for (int j = 1; j < s; j++) {
+      t(j) = tau(j-1);
+    }
+    t(s) = 1e9;
+  }
+  
+  // Define the objective function
+  double operator ()(const Eigen::VectorXd& x, Eigen::VectorXd& grad) {
+    double rho = x(0);
+    double ll = 0.0;
+    Eigen::MatrixXd pmf = grid_discretised_normal_pmf(g, t, rho);
+    ll = contingency_table_loglik(G, pmf);
+    grad[0] = dl_drho(rho, g, t, G, pmf);
+    return ll;
+  }
+};
 
 // Function to estimate thresholds from an Eigen VectorXd object
 Eigen::VectorXd estimate_thresholds(
     const Eigen::VectorXd& X,
     int N,
-    double correct = 0.1
+    const double& correct = 0.1
 ) {
   // Filter out NA values
   Eigen::VectorXd x = filter(X, !is_na(X));
@@ -412,17 +409,42 @@ Eigen::VectorXd estimate_thresholds(
   return q;
 }
 
-// Setting up an L-BFGS-B optimizer
-double poly_optim(Eigen::MatrixXd G, Eigen::VectorXd gamma, Eigen::VectorXd tau) {
-  // Define the objective function
-  auto objective = [&](const Eigen::VectorXd& x, Eigen::VectorXd& grad) -> double {
-    double rho = x(0);
-    double ll = 0.0;
-    grad[0] = dl_drho(rho, gamma, tau, G);
-    ll = polycor_objective(rho, gamma, tau, G);
-    return ll;
-  };
+// Function to estimate thresholds from a contingency table
+std::vector<Eigen::VectorXd> estimate_thresholds(
+    const Eigen::MatrixXd& G,
+    const int& r, // # of rows
+    const int& s, // # of columns
+    const int& N  // # of observations
+) {
+  std::vector<Eigen::VectorXd> thresholds;
   
+  // cumulative probabilities of latent X variable
+  Eigen::VectorXd row_cumsum = G.rowwise().sum();
+  for (int i = 1; i < r; i++) {
+    row_cumsum(i) = row_cumsum(i) + row_cumsum(i-1);
+  }
+  // cumulative probabilities of latent Y variable
+  Eigen::VectorXd col_cumsum = G.colwise().sum();
+  for (int j = 1; j < s; j++) {
+    col_cumsum(j) = col_cumsum(j) + col_cumsum(j-1);
+  }
+  
+  // Compute the thresholds
+  Eigen::VectorXd gamma = Phi_inv_vec(row_cumsum.head(r-1) / N);
+  Eigen::VectorXd tau   = Phi_inv_vec(col_cumsum.head(s-1) / N);
+  
+  thresholds.push_back(gamma);
+  thresholds.push_back(tau);
+  
+  return thresholds;
+}
+
+// Setting up an L-BFGS-B optimizer
+double poly_optim(
+    const Eigen::MatrixXd& G,
+    const Eigen::VectorXd& gamma,
+    const Eigen::VectorXd& tau
+) {
   // Define the initial point for the optimization
   int n = 1;
   Eigen::VectorXd x0 = Eigen::VectorXd::Constant(n, 0.0);
@@ -438,11 +460,14 @@ double poly_optim(Eigen::MatrixXd G, Eigen::VectorXd gamma, Eigen::VectorXd tau)
   Eigen::VectorXd lb = Eigen::VectorXd::Constant(n, -.999);
   Eigen::VectorXd ub = Eigen::VectorXd::Constant(n,  .999);
   
-  // Run the optimization
+  // Create solver and function object
   LBFGSpp::LBFGSBSolver<double, LBFGSpp::LineSearchMoreThuente> solver(params);
+  Polychoric poly(G, gamma, tau);
+  
+  // Run the optimization
   double f = 0.0;
   Eigen::VectorXd x = x0;
-  int niter = solver.minimize(objective, x, f, lb, ub);
+  int niter = solver.minimize(poly, x, f, lb, ub);
   
   // Return the optimal value of rho
   return x(0);
@@ -452,7 +477,7 @@ double poly_optim(Eigen::MatrixXd G, Eigen::VectorXd gamma, Eigen::VectorXd tau)
 // [[Rcpp::export(.poly_tab)]]
 double poly_tab(
     Eigen::MatrixXd G,
-    double correct = 0.1
+    const double& correct = 0.1
 ) {
   int r = G.rows();
   int s = G.cols();
@@ -472,23 +497,38 @@ double poly_tab(
     }
   }
   
-  // cumulative probabilities of latent X variable
-  Eigen::VectorXd sx = G.rowwise().sum();
-  for (int i = 1; i < r; i++) {
-    sx(i) = sx(i) + sx(i-1);
-  }
-  // cumulative probabilities of latent Y variable
-  Eigen::VectorXd sy = G.colwise().sum();
-  for (int j = 1; j < s; j++) {
-    sy(j) = sy(j) + sy(j-1);
-  }
+  std::vector<Eigen::VectorXd> thresholds = estimate_thresholds(G, r, s, N);
+  Eigen::VectorXd gamma = thresholds[0];
+  Eigen::VectorXd tau   = thresholds[1];
   
-  // Compute the thresholds
-  Eigen::VectorXd gamma = sx.head(r-1) / N;
-  Eigen::VectorXd tau   = sy.head(s-1) / N;
+  double rho = poly_optim(G, gamma, tau);
+  return(rho);
+}
+
+// Polychoric correlation given a contingency table
+double poly_tab_inside(
+    Eigen::MatrixXd G,
+    const Eigen::VectorXd& gamma,
+    const Eigen::VectorXd& tau,
+    const double& correct = 0.1
+) {
+  int r = G.rows();
+  int s = G.cols();
+  int N = G.sum();
+  // Check for perfect correlation first
+  double mds = G.diagonal().sum();        // Main diagonal sum
+  double sds = G.rowwise().reverse().diagonal().sum(); // Secondary diagonal sum
+  if (mds == N) {return  1.0;}
+  if (sds == N) {return -1.0;}
   
-  gamma = Phi_inv_vec(gamma);
-  tau   = Phi_inv_vec(tau);
+  // Correct for continuity
+  for (int i = 0; i < r; i++) {
+    for (int j = 0; j < s; j++) {
+      double x = G(i,j);
+      double v = (x == 0.0) ? (x + correct) : x;
+      G(i,j) = v;
+    }
+  }
   
   double rho = poly_optim(G, gamma, tau);
   return(rho);
@@ -539,47 +579,18 @@ double poly_xy(
   return poly_tab(G, correct);
 }
 
-// Polychoric correlation for a table generated inside poly_df()
-double poly_tab_inside(
-    Eigen::MatrixXd G,
-    double correct,
-    Eigen::VectorXd gamma,
-    Eigen::VectorXd tau
-) {
-  int r = G.rows();
-  int s = G.cols();
-  int N = G.sum();
-  // Check for perfect correlation first
-  double mds = G.diagonal().sum();        // Main diagonal sum
-  double sds = G.rowwise().reverse().diagonal().sum(); // Secondary diagonal sum
-  if (mds == N) {return  1.0;}
-  if (sds == N) {return -1.0;}
-  
-  // Correct for continuity
-  for (int i = 0; i < r; i++) {
-    for (int j = 0; j < s; j++) {
-      double x = G(i,j);
-      double v = (x == 0.0) ? (x + correct) : x;
-      G(i,j) = v;
-    }
-  }
-  
-  double rho = poly_optim(G, gamma, tau);
-  return(rho);
-}
-
 // Polychoric correlation to be used poly_df()
 double poly_xy_inside(
     const Eigen::VectorXd& x,
     const Eigen::VectorXd& y,
-    double correct = 0.1,
-    Eigen::VectorXd gamma = {},
-    Eigen::VectorXd tau   = {}
+    const Eigen::VectorXd& gamma,
+    const Eigen::VectorXd& tau,
+    double correct = 0.1
 ) {
   // Construct a contingency table
   Eigen::MatrixXd G = contingency_table(x, y);
   // Use the function for a table
-  return poly_tab_inside(G, correct, gamma, tau);
+  return poly_tab_inside(G, gamma, tau, correct);
 }
 
 // Polychoric correlation matrix for a data frame of ordinal items
@@ -630,7 +641,7 @@ Eigen::MatrixXd poly_df(Rcpp::List X, double correct = 0.1) {
         );
         rho = cor_spearman(x, y);
       } else {
-        rho = poly_xy_inside(xc, yc, correct, gamma, tau);
+        rho = poly_xy_inside(xc, yc, gamma, tau, correct);
       }
       Corr(i,j) = rho;
       Corr(j,i) = rho;
@@ -640,7 +651,7 @@ Eigen::MatrixXd poly_df(Rcpp::List X, double correct = 0.1) {
   return Corr;
 }
 
-double poly_pval(double rho, int n) {
+double poly_pval(const double& rho, const int& n) {
   if (rho == 1.0 || rho == -1.0) return 2e-16;
   
   double z = 0.5 * log((1 + rho) / (1 - rho));
@@ -659,11 +670,12 @@ double poly_pval(double rho, int n) {
 // [[Rcpp::export(.poly_tab_full)]]
 Rcpp::List poly_tab_full(
     Eigen::MatrixXd G,
-    double correct
+    const double& correct
 ) {
   // Return values
   double rho, pval;
   Rcpp::List res(4);
+  res.attr("class") = "polychoric";
   
   int r = G.rows();
   int s = G.cols();
@@ -678,23 +690,9 @@ Rcpp::List poly_tab_full(
     }
   }
   
-  // cumulative probabilities of latent X variable
-  Eigen::VectorXd sx = G.rowwise().sum();
-  for (int i = 1; i < r; i++) {
-    sx(i) = sx(i) + sx(i-1);
-  }
-  // cumulative probabilities of latent Y variable
-  Eigen::VectorXd sy = G.colwise().sum();
-  for (int j = 1; j < s; j++) {
-    sy(j) = sy(j) + sy(j-1);
-  }
-  
-  // Compute the thresholds
-  Eigen::VectorXd gamma = sx.head(r-1) / N;
-  Eigen::VectorXd tau   = sy.head(s-1) / N;
-  
-  gamma = Phi_inv_vec(gamma);
-  tau   = Phi_inv_vec(tau);
+  std::vector<Eigen::VectorXd> thresholds = estimate_thresholds(G, r, s, N);
+  Eigen::VectorXd gamma = thresholds[0];
+  Eigen::VectorXd tau   = thresholds[1];
   
   // Check for perfect correlation first
   double mds = G.diagonal().sum();        // Main diagonal sum
@@ -792,7 +790,7 @@ Rcpp::List poly_df_full(Rcpp::List X, double correct = 0.1) {
         );
         rho = cor_spearman(x, y);
       } else {
-        rho = poly_xy_inside(xc, yc, correct, gamma, tau);
+        rho = poly_xy_inside(xc, yc, gamma, tau,correct);
       }
       Corr(i,j) = rho;
       Corr(j,i) = rho;
@@ -808,5 +806,6 @@ Rcpp::List poly_df_full(Rcpp::List X, double correct = 0.1) {
     Rcpp::Named("pval") = Pval,
     Rcpp::Named("tau") = thresholds
   );
+  res.attr("class") = "polychoric";
   return res;
 }

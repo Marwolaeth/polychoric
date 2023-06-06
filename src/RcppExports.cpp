@@ -12,13 +12,13 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // poly_tab
-double poly_tab(Eigen::MatrixXd G, double correct);
+double poly_tab(Eigen::MatrixXd G, const double& correct);
 RcppExport SEXP _polychoric_poly_tab(SEXP GSEXP, SEXP correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Eigen::MatrixXd >::type G(GSEXP);
-    Rcpp::traits::input_parameter< double >::type correct(correctSEXP);
+    Rcpp::traits::input_parameter< const double& >::type correct(correctSEXP);
     rcpp_result_gen = Rcpp::wrap(poly_tab(G, correct));
     return rcpp_result_gen;
 END_RCPP
@@ -49,13 +49,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // poly_tab_full
-Rcpp::List poly_tab_full(Eigen::MatrixXd G, double correct);
+Rcpp::List poly_tab_full(Eigen::MatrixXd G, const double& correct);
 RcppExport SEXP _polychoric_poly_tab_full(SEXP GSEXP, SEXP correctSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Eigen::MatrixXd >::type G(GSEXP);
-    Rcpp::traits::input_parameter< double >::type correct(correctSEXP);
+    Rcpp::traits::input_parameter< const double& >::type correct(correctSEXP);
     rcpp_result_gen = Rcpp::wrap(poly_tab_full(G, correct));
     return rcpp_result_gen;
 END_RCPP

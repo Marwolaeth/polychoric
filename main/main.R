@@ -74,6 +74,7 @@ polycorr(G)
 
 #### A data.frame ----
 polycorr(gss12_values)
+.poly_df_full(gss12_values)
 
 #### Mixed variable types ----
 # For safety, returns Spearman's rho if at least one of the vectors
