@@ -380,7 +380,7 @@ public:
 Eigen::VectorXd estimate_thresholds(
     const Eigen::VectorXd& X,
     int N,
-    const double& correct = 0.1
+    const double& correct = 1e-08
 ) {
   // Filter out NA values
   Eigen::VectorXd x = filter(X, !is_na(X));
@@ -474,7 +474,7 @@ double poly_optim(
 // [[Rcpp::export(.poly_tab)]]
 double poly_tab(
     Eigen::MatrixXd G,
-    const double& correct = 0.1
+    const double& correct = 1e-08
 ) {
   int r = G.rows();
   int s = G.cols();
@@ -507,7 +507,7 @@ double poly_tab_inside(
     Eigen::MatrixXd G,
     const Eigen::VectorXd& gamma,
     const Eigen::VectorXd& tau,
-    const double& correct = 0.1
+    const double& correct = 1e-08
 ) {
   int r = G.rows();
   int s = G.cols();
@@ -551,7 +551,7 @@ Eigen::MatrixXd contingency_table(
 double poly_xy(
     const Eigen::VectorXd& X,
     const Eigen::VectorXd& Y,
-    double correct = 0.1
+    const double& correct = 1e-08
 ) {
   // Filter for pairwise complete observations
   // auto start = std::chrono::system_clock::now(); // TIME IT
@@ -603,7 +603,7 @@ double poly_xy_inside(
     const Eigen::VectorXd& y,
     const Eigen::VectorXd& gamma,
     const Eigen::VectorXd& tau,
-    double correct = 0.1
+    const double& correct = 1e-08
 ) {
   // Construct a contingency table
   Eigen::MatrixXd G = contingency_table(x, y);
@@ -613,7 +613,7 @@ double poly_xy_inside(
 
 // Polychoric correlation matrix for a data frame of ordinal items
 // [[Rcpp::export(.poly_df)]]
-Eigen::MatrixXd poly_df(Rcpp::List X, double correct = 0.1) {
+Eigen::MatrixXd poly_df(Rcpp::List X, double correct = 1e-08) {
   int m = X.size();                           // number of items
   int N = ((Rcpp::IntegerVector)X[0]).size(); // number of respondents
   
@@ -750,7 +750,7 @@ Rcpp::List poly_tab_full(
 Rcpp::List poly_xy_full(
     const Eigen::VectorXd& x,
     const Eigen::VectorXd& y,
-    double correct = 0.1
+    const double& correct = 1e-08
 ) {
   // Construct a contingency table
   Eigen::MatrixXd G = contingency_table(x, y);
@@ -760,7 +760,7 @@ Rcpp::List poly_xy_full(
 
 // Polychoric correlation + supplementary information
 // [[Rcpp::export(.poly_df_full)]]
-Rcpp::List poly_df_full(Rcpp::List X, double correct = 0.1) {
+Rcpp::List poly_df_full(Rcpp::List X, double correct = 1e-08) {
   int m = X.size();                           // number of items
   int N = ((Rcpp::IntegerVector)X[0]).size(); // number of respondents
   int nc = (m * (m-1)) / 2;                   // number of correlations

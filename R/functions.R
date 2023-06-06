@@ -61,7 +61,7 @@
 polycorr <- function(
     x,
     y = NULL,
-    correct = 0.1,
+    correct = 1e-08,
     coef.only = TRUE
 ) {
   ## Case 1: two vectors
