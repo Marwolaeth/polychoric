@@ -121,10 +121,10 @@ bm <- microbenchmark(
 )
 bm
 
-bm <- microbenchmark(
+bm_xy <- microbenchmark(
   standard = polychoric(table(gss12_values$valorig, gss12_values$valeql)),
   polycorr = polycorr(gss12_values$valorig, gss12_values$valeql),
   times = 32L,
   control = list(warmup = 6)
 )
-bm
+bm_xy
