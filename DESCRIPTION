@@ -5,11 +5,15 @@ Version: 0.9
 Date: 2023-05-30
 Author: Andrej Pawluczenko
 Maintainer: Andrej Pawluczenko <a.pawluczenko@gmail.com>
-Description: A wrapper for C++ routines for calculating polychoric correlation
-    coefficients often used in social science or marketing research. Single
-    function `polycorr()` can take in ordinal factor (possibly integer) vectors,
-    a contingency table or a data frame. It returns corresponding polychoric
-    correlation estimates in a form of single numeric value or correlation matrix.
+Description: A wrapper for C++ routines for calculating polychoric and polyserial
+    correlation coefficients often used in social science or marketing research.
+    The `cor_polychoric()` function can take in ordinal factor (possibly integer)
+    vectors, a contingency table or a data frame. It returns corresponding polychoric
+    correlation estimates in a form of single numeric value or correlation matrix. 
+    The `cor_polyserial()` takes exactly one continuous and one ordinal vector
+    and returns a polyserial coefficient estimate. Both functions optionally return
+    the p-values associated with the coefficients and estimated discretization thresholds
+    for ordinal variables.
 License: MIT + file LICENSE
 Suggests: tinytest
 Encoding: UTF-8

@@ -41,7 +41,27 @@ df <- data.frame(
 )
 head(df, 13)
 
-#### Correlate ----
-polycorr(df)
-polycorr(df, coef.only = FALSE)
+#### Test correlations ----
+cor_polychoric(df)
+cor_polychoric(df, coef.only = FALSE)
+cor_polychoric(df$t1, df$t2, coef.only = FALSE)
 
+## POLYSERIAL CORRELATION ----
+
+#### Create Dataset ----
+n <- 200
+x <- rnorm(n, 100, 11)
+y <- (x - 100) / 11 + rnorm(n)
+C <- cut(x, breaks = 5, ordered_result = TRUE)
+D <- cut(y, breaks = 5, ordered_result = TRUE)
+
+#### Test correlations ----
+cor_polyserial(x, D)
+cor_polyserial(x, D, coef.only = FALSE)
+cor_polyserial(x, C) # currently unable to handle perfect correlation
+cor_polyserial(y, C)
+cor_polyserial(y, D) # currently unable to handle perfect correlation
+
+x[sample(1:n, 6)] <- NaN
+D[sample(1:n, 6)] <- NA
+cor_polyserial(x, D)

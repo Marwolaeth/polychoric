@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# polychoric <img src="man/figures/logo.png" align="right" height="139" />
+# polychoric <img src="man/figures/logo.png" align="right" height="139" title="Created with hexSticker package" />
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/Marwolaeth/polychoric/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Marwolaeth/polychoric/actions/workflows/R-CMD-check.yaml)
@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 Fast Polychoric Correlation for Vectors and Data Frames
 
 ## About
-Polychoric is a package that provides a wrapper for C++ routines used to calculate polychoric correlation coefficients, which are often used in social science or marketing research. The single `polycorr()` function can take in ordinal factor vectors, a contingency table, or a data frame and returns corresponding polychoric correlation estimates in the form of a single numeric value or a correlation matrix.
+Polychoric is a package that provides a wrapper for C++ routines used to calculate polychoric correlation coefficients, which are often used in social science or marketing research. The single `cor_polychoric()` function can take in ordinal factor vectors, a contingency table, or a data frame and returns corresponding polychoric correlation estimates in the form of a single numeric value or a correlation matrix.
 
 <details>
   <summary>Spoiler</summary>
@@ -37,13 +37,13 @@ You can install the development version of polychoric from [GitHub](https://gith
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("Marwolaeth/polychoric")
+# devtools::install_github("Marwolaeth/polychoric")
 ```
   
 ## The Purpose
-Polychoric correlation coefficients are a type of correlation coefficient used to measure the relationship between two ordinal variables. They are computed by estimating the correlation between two underlying continuous variables that are assumed to give rise to the observed ordinal data. The `polycorr()` function estimates latent Pearson correlation coefficients under the assumption that the latent traits of interest are standard normal random variables.
+Polychoric correlation coefficients are a type of correlation coefficient used to measure the relationship between two ordinal variables. They are computed by estimating the correlation between two underlying continuous variables that are assumed to give rise to the observed ordinal data. The `cor_polychoric()` function estimates latent Pearson correlation coefficients under the assumption that the latent traits of interest are standard normal random variables.
 
-The computation of polychoric correlation coefficients involves estimating the thresholds (here called `gamma` and `tau`, like in (*Drasgow 1986*), or just `tau` as in `psych` package (*Revelle 2023*)) that separate the ordinal categories for each variable. These thresholds are used to transform the ordinal data into a set of continuous variables, which can then be used to estimate the correlation coefficient using standard methods. The `polycorr()` function currently estimates the thresholds using a two-step maximum likelihood estimation, where first the thresholds are deduced from univariate distributions of ordinal variables and then the `L-BFGS-B` optimization algorithm (implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/), *Yixuan 2023*) is used to find the value of the correlation coefficient $\rho$ that maximizes the likelihood of the observed contingency table. The `toms462` (*Donnelly 1973*, *Owen 1956*) [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html) is used to approximate the bivariate normal distribution (quadrant probabilities) of threshold values.
+The computation of polychoric correlation coefficients involves estimating the thresholds (here called `gamma` and `tau`, like in (*Drasgow 1986*), or just `tau` as in `psych` package (*Revelle 2023*)) that separate the ordinal categories for each variable. These thresholds are used to transform the ordinal data into a set of continuous variables, which can then be used to estimate the correlation coefficient using standard methods. The `cor_polychoric()` function currently estimates the thresholds using a two-step maximum likelihood estimation, where first the thresholds are deduced from univariate distributions of ordinal variables and then the `L-BFGS-B` optimization algorithm (implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/), *Yixuan 2023*) is used to find the value of the correlation coefficient $\rho$ that maximizes the likelihood of the observed contingency table. The `toms462` (*Donnelly 1973*, *Owen 1956*) [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html) is used to approximate the bivariate normal distribution (quadrant probabilities) of threshold values.
 
 Polychoric correlation coefficients are useful for analyzing data that involve ordinal variables, such as Likert scales or survey responses. They provide a measure of the strength and direction of the relationship between two ordinal variables, which can be useful for understanding patterns in the data.
 
@@ -72,20 +72,20 @@ gss12_values |> as.data.frame() |> likert() |> plot()
 Coefficient only:
 
 ```{r example-xy-coef}
-polycorr(gss12_values$valorig, gss12_values$valeql)
+cor_polychoric(gss12_values$valorig, gss12_values$valeql)
 ```
 
 Full output:
 
 ```{r example-xy-full}
-polycorr(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
+cor_polychoric(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
 ```
 
 ### For a contingency table
 
 ```{r example-contingency}
 (G <- table(gss12_values$valorig, gss12_values$valeql))
-polycorr(G)
+cor_polychoric(G)
 # side with psych:polychoric()
 psych::polychoric(G, correct = .1)$rho
 ```
@@ -93,7 +93,7 @@ psych::polychoric(G, correct = .1)$rho
 Notice that threshold values are exactly the same for both functions:
 
 ```{r example-contingency-full}
-polycorr(G, coef.only = FALSE)
+cor_polychoric(G, coef.only = FALSE)
 # side with psych:polychoric()
 psych::polychoric(G, correct = .1)
 ```
@@ -101,7 +101,7 @@ psych::polychoric(G, correct = .1)
 ### For a data frame
 
 ```{r example-corrmatrix}
-polycorr(gss12_values)
+cor_polychoric(gss12_values)
 ```
 
 Let's visualise and compare our matrices. We suggest `pheatmap` package for quick correlation matrix visualisation. `corrplot` is also a good option.
@@ -115,7 +115,7 @@ if (!require(pheatmap)) {
   install.packages('pheatmap')
   library(pheatmap)
 }
-rho1 <- polycorr(gss12_values)
+rho1 <- cor_polychoric(gss12_values)
 # psych::polychoric() doesn't work with factor data directly
 gss_num <- gss12_values |> lapply(as.integer) |> as.data.frame()
 rho2 <- polychoric(gss_num)
@@ -139,18 +139,29 @@ pheatmap(
 
 ### Handling mixed variable types
 
-The `polycorr()` function is currently limited in its flexibility as it only provides polychoric estimation for ordinal variables and does not support biserial or polyserial estimation for mixed ordinal and continuous variables. The function does, however, attempt to recognise potentially non-discrete variables, allowing for up to 10 levels, like in [World Values Survey](https://www.worldvaluessurvey.org/wvs.jsp) questionnaire items. In comparison, the `polychoric()` function from the `psych` package allows up to 8 levels by default.
+The `cor_polychoric()` function is currently limited in its flexibility as it only provides polychoric estimation for ordinal variables and does not support biserial or polyserial estimation for mixed ordinal and continuous variables. The function does, however, attempt to recognise potentially non-discrete variables, allowing for up to 10 levels, like in [World Values Survey](https://www.worldvaluessurvey.org/wvs.jsp) questionnaire items. In comparison, the `polychoric()` function from the `psych` package allows up to 8 levels by default.
 
-It's worth noting that variables with a high number of distinct values may cause estimation issues, so the `polycorr()` function returns Spearman's $\rho$ instead (with a warning).
+It's worth noting that variables with a high number of distinct values may cause estimation issues, so the `cor_polychoric()` function returns Spearman's $\rho$ instead (with a warning).
 
 ```{r example-mixed}
 x <- rnorm(nrow(gss12_values))
-polycorr(gss12_values$valspl, x)
+cor_polychoric(gss12_values$valspl, x)
 ```
+
+### Polyserial correlation
+
+Alternatively, one can correlate a continuous and an ordinal variable explicitly using polyserial correlation. The `polychoric` package contains `cor_polyserial()` function that estimates polyserial correlation coefficients between a continuous and an ordinal variable.
+
+```{r example-polyserial}
+x <- rnorm(nrow(gss12_values))
+cor_polyserial(x, gss12_values$valspl)
+```
+
+Due to its strong bivariate normality assumptions, `cor_polyserial()` is currently not a default choice for a mixed continuous-ordinal variable correlation.
 
 ### Handling missing values
 
-The `polycorr()` function always uses pairwise complete observations. Therefore, the user need not worry about missing data. However, depending on the analysis design and the ratio of missing data, it may be essential to check for patterns of missingness and consider imputation.
+The `cor_polychoric()` function always uses pairwise complete observations. Therefore, the user need not worry about missing data. However, depending on the analysis design and the ratio of missing data, it may be essential to check for patterns of missingness and consider imputation.
 
 The General Social Survey Schwartz Values Module dataset is cleared of missing values (non-response or non-applicable). Here we introduce some NAs into random places across the dataset. The summary will show the dataset now actually contains missings.
 
@@ -173,7 +184,7 @@ Let's rerun the estimation: the function works, though coefficients may be diffe
 
 ```{r example-missing-02}
 pheatmap(
-  polycorr(gss_miss),
+  cor_polychoric(gss_miss),
   cluster_rows = FALSE,
   cluster_cols = FALSE,
   display_numbers = TRUE,
@@ -193,12 +204,14 @@ if (!require(microbenchmark)) {
 }
 bm <- microbenchmark(
   standard = polychoric(gss_num),
-  polycorr = polycorr(gss12_values),
+  cor_polychoric = cor_polychoric(gss12_values),
   times = 32L,
   control = list(warmup = 6)
 )
 bm
 ```
+
+Another minor advantage of the `polychoric` package is that its functions accept ordinal factor variables without need to convert them explicitly.
 
 ## Development
 This is an alpha version of the package. It is under development.
@@ -208,8 +221,7 @@ Please report any issues you came up with on the [issues](https://github.com/Mar
 <details>
   <summary>The upcoming steps</summary>
   
-  1. Provide a polyserial correlation estimation function.
-  2. Implement (optional) more robust distributional assumptions, e.g. a skew normal distribution (*Jin and Yang-Wallentin 2017*).
+  1. Implement (optional) more robust distributional assumptions, e.g. a skew normal distribution (*Jin and Yang-Wallentin 2017*).
  </details>
 
 ## References

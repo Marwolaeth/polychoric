@@ -85,6 +85,32 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cor_polyserial
+double cor_polyserial(const Eigen::VectorXd& x, const Eigen::VectorXd& d, const double& correct);
+RcppExport SEXP _polychoric_cor_polyserial(SEXP xSEXP, SEXP dSEXP, SEXP correctSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type d(dSEXP);
+    Rcpp::traits::input_parameter< const double& >::type correct(correctSEXP);
+    rcpp_result_gen = Rcpp::wrap(cor_polyserial(x, d, correct));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cor_polyserial_full
+Rcpp::List cor_polyserial_full(const Eigen::VectorXd& x, const Eigen::VectorXd& d, const double& correct);
+RcppExport SEXP _polychoric_cor_polyserial_full(SEXP xSEXP, SEXP dSEXP, SEXP correctSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type d(dSEXP);
+    Rcpp::traits::input_parameter< const double& >::type correct(correctSEXP);
+    rcpp_result_gen = Rcpp::wrap(cor_polyserial_full(x, d, correct));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_polychoric_poly_tab", (DL_FUNC) &_polychoric_poly_tab, 2},
@@ -93,6 +119,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_polychoric_poly_tab_full", (DL_FUNC) &_polychoric_poly_tab_full, 2},
     {"_polychoric_poly_xy_full", (DL_FUNC) &_polychoric_poly_xy_full, 3},
     {"_polychoric_poly_df_full", (DL_FUNC) &_polychoric_poly_df_full, 2},
+    {"_polychoric_cor_polyserial", (DL_FUNC) &_polychoric_cor_polyserial, 3},
+    {"_polychoric_cor_polyserial_full", (DL_FUNC) &_polychoric_cor_polyserial_full, 3},
     {NULL, NULL, 0}
 };
 

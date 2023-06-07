@@ -1,8 +1,5 @@
 // -*- mode: C++; c-indent-level: 4; c-basic-offset: 4; indent-tabs-mode: nil; -*-
 
-#define EIGEN_USE_BLAS
-
-#include <Rcpp.h>
 #include <RcppEigen.h>
 // [[Rcpp::depends(RcppEigen)]]
 
@@ -63,6 +60,7 @@
 
 const double pi = 3.1415926535; // set pi
 
+// ## UTILS
 Eigen::Array<bool, Eigen::Dynamic, 1> is_na(const Eigen::VectorXd& x) {
   return x.array().isNaN();
 }
@@ -82,7 +80,7 @@ Eigen::VectorXd filter(
     const Eigen::VectorXd& x,
     const Eigen::Array<bool, Eigen::Dynamic, 1>& mask
 ) {
-  // Vreate empty vector to store selected values
+  // Create empty vector to store selected values
   Eigen::VectorXd xc = {};
   
   // Filter the array based on the mask
@@ -113,7 +111,7 @@ int n_unique(const Eigen::VectorXd& X) {
 }
 
 // Function to calculate rank of vector elements with ties resolved by mean rank
-Eigen::VectorXd rank_vec(const Eigen::VectorXd& v) {
+Eigen::VectorXd rank_(const Eigen::VectorXd& v) {
   // Filter out NA values
   Eigen::VectorXd x = filter(v, !is_na(v));
   int n = x.size();
@@ -139,26 +137,6 @@ Eigen::VectorXd rank_vec(const Eigen::VectorXd& v) {
   return r;
 }
 
-double cor_spearman(const Eigen::VectorXd& X, const Eigen::VectorXd& Y) {
-  // Filter for pairwise complete observations
-  Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, Y);
-  Eigen::VectorXd x = filter(X, pco);
-  Eigen::VectorXd y = filter(Y, pco);
-  
-  long long int n = x.size();
-  Eigen::VectorXd d(n);
-  double rho;
-  // check for equal length
-  // if (y.size() != n) {
-  //   Rcpp::stop("Vectors are of different dimensionality");
-  // }
-  d = rank_vec(x).array() - rank_vec(y).array();
-  rho = 1.0 - (6.0 * (d.dot(d))) / (n*(n*n - 1));
-  rho = (rho < -1.0) ? -1.0 : rho;
-  rho = (rho >  1.0) ?  1.0 : rho;
-  return rho;
-}
-
 Eigen::VectorXd correct_data(Eigen::VectorXd x) {
   double minx = x.minCoeff();
   if (minx <= 0) {
@@ -167,6 +145,23 @@ Eigen::VectorXd correct_data(Eigen::VectorXd x) {
     x = x.array() + correct;
   }
   return x;
+}
+
+// ## DISTRIBUTIONS
+// normal probability density function of x given e and s
+double phi(const double& x, const double& e = 0.0, const double& s = 1.0) {
+  return std::exp(-0.5 * std::pow((x - e) / s, 2)) / (s * std::sqrt(2.0 * pi));
+}
+
+Eigen::VectorXd phi_(const Eigen::VectorXd& x, const double& e = 0.0, const double& s = 1.0) {
+  const int n = x.size();
+  const double denom = s * std::sqrt(2.0 * pi);
+  
+  Eigen::VectorXd pdf(n);
+  for (int i = 0; i < n; i++) {
+    pdf(i) = std::exp(-0.5 * std::pow((x(i) - e) / s, 2)) / denom;
+  }
+  return pdf;
 }
 
 double Phi(const double& x, const double& e = 0.0, const double& s = 1.0) {
@@ -196,7 +191,7 @@ double Phi_inv(const double& p, const double& e = 0.0, const double& s = 1.0) {
   return x;
 }
 
-Eigen::VectorXd Phi_inv_vec(
+Eigen::VectorXd Phi_inv_(
     const Eigen::VectorXd& p,
     const double& e = 0.0,
     const double& s = 1.0
@@ -229,7 +224,7 @@ double phi2(
   double z2 = (y - e2) / s2; // calculate standardized value of y
   // calculate PDF value
   double pdf = 1.0 / (2 * pi * s1 * s2 * std::sqrt(1 - r*r)) * 
-    std::exp(-(z1*z1 - 2*r*z1*z2 + z2*z2 + 1e-12) / (2 * (1 - r*r) + 1e-12));
+    std::exp(-(z1*z1 - 2*r*z1*z2 + z2*z2 + 1e-8) / (2 * (1 - r*r) + 1e-8));
   return pdf; // return PDF value
 }
 
@@ -249,6 +244,64 @@ double Phi2(
   double z2 = (y - e2) / s2; // calculate standardized value of y
   double cdf = bivnor(-z1, -z2, r);
   return cdf; // return PDF value
+}
+
+// ## MOMENTS
+// #### Univariate
+double Var(const Eigen::VectorXd& x) {
+  Eigen::ArrayXd x_arr = x.array().isNaN().select(0, x);
+  Eigen::Index n = x_arr.size();
+  double var = (x_arr - x_arr.mean()).square().sum() / (n - 1);
+  return var;
+}
+
+double SD(const Eigen::VectorXd& x) {
+  double v = Var(x);
+  return std::sqrt(v);
+}
+
+double skewness(const Eigen::VectorXd& x) {
+  Eigen::ArrayXd x_arr = x.array();
+  Eigen::Index n = x.size();
+  double mean = x.mean();
+  double var = (x_arr - mean).square().sum() / (n - 1);
+  double std_dev = std::sqrt(var);
+  double skew = ((x_arr - mean).pow(3.0)).sum() /
+    ((n - 1) * std_dev * std_dev * std_dev);
+  return skew;
+}
+
+// #### Bivariate
+double Cov(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
+  Eigen::Index n = x.size();
+  Eigen::VectorXd x_centered = x.array() - x.mean();
+  Eigen::VectorXd y_centered = y.array() - y.mean();
+  double covar = (x_centered.dot(y_centered)) / (n - 1);
+  return covar;
+}
+
+double cor_pearson(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
+  return Cov(x, y) / (SD(x) * SD(y));
+}
+
+double cor_spearman(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
+  // Filter for pairwise complete observations
+  // Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, Y);
+  // Eigen::VectorXd x = filter(X, pco);
+  // Eigen::VectorXd y = filter(Y, pco);
+  
+  long long int n = x.size();
+  Eigen::VectorXd d(n);
+  double rho;
+  // check for equal length
+  // if (y.size() != n) {
+  //   Rcpp::stop("Vectors are of different dimensionality");
+  // }
+  d = rank_(x).array() - rank_(y).array();
+  rho = 1.0 - (6.0 * (d.dot(d))) / (n*(n*n - 1));
+  rho = (rho < -1.0) ? -1.0 : rho;
+  rho = (rho >  1.0) ?  1.0 : rho;
+  return rho;
 }
 
 // Polychoric correlation and thresholds as class to be returned
@@ -305,7 +358,7 @@ private:
       const Eigen::MatrixXd& P
   ) {
     // Compute log likelihood of contingency table G given matrix of probabilities P
-
+    
     double loglik = 0.0;
     for (int i = 0; i < r; i++) {
       for (int j = 0; j < s; j++) {
@@ -353,18 +406,18 @@ public:
     
     // append large values to gamma and tau
     g = Eigen::VectorXd(r+1);
-    g(0) = -1e9;
+    g(0) = -1e6;
     for (int i = 1; i < r; i++) {
       g(i) = gamma(i-1);
     }
-    g(r) = 1e9;
+    g(r) = 1e6;
     
     t = Eigen::VectorXd(s+1);
-    t(0) = -1e9;
+    t(0) = -1e6;
     for (int j = 1; j < s; j++) {
       t(j) = tau(j-1);
     }
-    t(s) = 1e9;
+    t(s) = 1e6;
   }
   
   // Define the objective function
@@ -380,12 +433,10 @@ public:
 
 // Function to estimate thresholds from an Eigen VectorXd object
 Eigen::VectorXd estimate_thresholds(
-    const Eigen::VectorXd& X,
+    const Eigen::VectorXd& x,
     int N,
     const double& correct = 1e-08
 ) {
-  // Filter out NA values
-  Eigen::VectorXd x = filter(X, !is_na(X));
   N = x.size();
   
   int m = x.maxCoeff();
@@ -404,7 +455,7 @@ Eigen::VectorXd estimate_thresholds(
   Eigen::VectorXd p(m-1);
   p = counts.head(m-1).array() / N;
   Eigen::VectorXd q(m-1);
-  q = Phi_inv_vec(p);
+  q = Phi_inv_(p);
   return q;
 }
 
@@ -429,8 +480,8 @@ std::vector<Eigen::VectorXd> estimate_thresholds(
   }
   
   // Compute the thresholds
-  Eigen::VectorXd gamma = Phi_inv_vec(row_cumsum.head(r-1) / N);
-  Eigen::VectorXd tau   = Phi_inv_vec(col_cumsum.head(s-1) / N);
+  Eigen::VectorXd gamma = Phi_inv_(row_cumsum.head(r-1) / N);
+  Eigen::VectorXd tau   = Phi_inv_(col_cumsum.head(s-1) / N);
   
   thresholds.push_back(gamma);
   thresholds.push_back(tau);
@@ -439,7 +490,7 @@ std::vector<Eigen::VectorXd> estimate_thresholds(
 }
 
 // Setting up an L-BFGS-B optimizer
-double poly_optim(
+double optim_polychoric(
     const Eigen::MatrixXd& G,
     const Eigen::VectorXd& gamma,
     const Eigen::VectorXd& tau
@@ -500,7 +551,7 @@ double poly_tab(
   Eigen::VectorXd gamma = thresholds[0];
   Eigen::VectorXd tau   = thresholds[1];
   
-  double rho = poly_optim(G, gamma, tau);
+  double rho = optim_polychoric(G, gamma, tau);
   return(rho);
 }
 
@@ -529,7 +580,7 @@ double poly_tab_inside(
     }
   }
   
-  double rho = poly_optim(G, gamma, tau);
+  double rho = optim_polychoric(G, gamma, tau);
   return(rho);
 }
 
@@ -659,7 +710,7 @@ Eigen::MatrixXd poly_df(Rcpp::List X, double correct = 1e-08) {
         Rcpp::warning(
           "Too many levels or continuous input: returning Spearman's rho"
         );
-        rho = cor_spearman(x, y);
+        rho = cor_spearman(xc, yc);
       } else {
         rho = poly_xy_inside(xc, yc, gamma, tau, correct);
       }
@@ -736,7 +787,7 @@ Rcpp::List poly_tab_full(
     return res;
   }
   
-  rho = poly_optim(G, gamma, tau);
+  rho = optim_polychoric(G, gamma, tau);
   pval = poly_pval(rho, N);
   
   res = Rcpp::List::create(
@@ -809,7 +860,7 @@ Rcpp::List poly_df_full(Rcpp::List X, double correct = 1e-08) {
         Rcpp::warning(
           "Too many levels or continuous input: returning Spearman's rho"
         );
-        rho = cor_spearman(x, y);
+        rho = cor_spearman(xc, yc);
       } else {
         rho = poly_xy_inside(xc, yc, gamma, tau,correct);
       }
@@ -831,5 +882,177 @@ Rcpp::List poly_df_full(Rcpp::List X, double correct = 1e-08) {
     Rcpp::Named("tau") = thresholds
   );
   res.attr("class") = "polychoric";
+  return res;
+}
+
+// Polychoric correlation and thresholds as class to be returned
+class Polyserial {
+private:
+  Eigen::VectorXd x;    // continuous variable X
+  Eigen::VectorXd d;    // ordinal variable D
+  int n;                // # of observations
+  int s;                // # of categories
+  Eigen::VectorXd z;    // standardized values (z-scores) of x
+  double correct;       // correct for continuity
+  
+  // Probabilities of D = d_k given x_k
+  Eigen::VectorXd polyserial_pd(const double& rho, const Eigen::VectorXd& rz) {
+    // Declare vector to return
+    Eigen::VectorXd P_d_x(n);
+    // Constant components
+    double denom = std::sqrt(1.0 - rho*rho + 1e-8);
+    
+    // Iterate over observations
+    for (int k = 0; k < n; k++) {
+      int j = d(k)-1;
+      double tau_star_j   = (d(k)<s) ? (tau(j)   - rz(k)) / denom :  1e6;
+      double tau_star_jm1 = (j>1)    ? (tau(j-1) - rz(k)) / denom : -1e6;
+      P_d_x(k) = Phi(tau_star_j) - Phi(tau_star_jm1);
+    }
+    return P_d_x;
+  }
+  
+  // Log likelihood of observations given hypothesised probabilities
+  double polyserial_loglik(const Eigen::VectorXd& Pd) {
+    
+    Eigen::VectorXd logP = (Pd.array() + 1e-8).log();
+    Eigen::VectorXd logfx = (phi_(x, mu, sigma).array() + 1e-8).log();
+    double loglik = (logfx + logP).sum();
+    
+    return -loglik;
+  }
+  
+  // Partial derivative of log likelihood w/ respect to rho
+  double dl_drho(
+      const double& rho,
+      const Eigen::VectorXd& Pd,
+      const Eigen::VectorXd& rz
+  ) {
+    // Compute the partial derivative of the log likelihood with respect to rho
+    double dl = 0.0;
+    // Constants depending on rho only
+    double denom = std::sqrt(1.0 - rho*rho + 1e-6);
+    double dtau_denom = 1 / std::pow(1.0 - rho*rho + 1e-6, 3/2);
+    
+    for (int k = 0; k < n; k++) {
+      int j = d(k)-1;
+      // Rename tau_star for t for compactness
+      double phi_t_j   = (d(k)<s) ? phi((tau(j)   - rz(k)) / denom) : 0.0;
+      double phi_t_jm1 = (j>1)    ? phi((tau(j-1) - rz(k)) / denom) : 0.0;
+      
+      if (Pd(k) > 0.0) {
+        double dlk = (1/Pd(k) * dtau_denom) *
+          ((phi_t_j*(tau(j)*rho - z(k))) - (phi_t_jm1*(tau(j-1)*rho - z(k))));
+        dl += dlk;
+      }
+    }
+    return -dl;
+  }
+  
+public:
+  // Variable parameters made available for the wrapper output
+  double rho;           // optimal value of rho
+  Eigen::VectorXd tau;  // thresholds of Y underlying D
+  double mu;            // mean of X
+  double sigma;         // standard deviation of X
+  
+  // Define constructor
+  Polyserial(
+    const Eigen::VectorXd& X, // Continuous covariate
+    const Eigen::VectorXd& D, // Ordinal covariate
+    const double& correct
+  ) : x(X), d(D), correct(correct) {
+    n = d.size();
+    s = d.maxCoeff();
+    z = (x.array() - x.mean()) / SD(x);
+    tau = estimate_thresholds(d, correct);
+    mu = x.mean();
+    sigma = SD(x);
+  }
+  
+  // Define the objective function
+  double operator ()(const Eigen::VectorXd& x, Eigen::VectorXd& grad) {
+    double rho = x(0);
+    double ll = 0.0;
+    Eigen::VectorXd rz = z.array() * rho;    // \rho × z
+    Eigen::VectorXd Pd = polyserial_pd(rho, rz);
+    ll = polyserial_loglik(Pd);
+    grad[0] = dl_drho(rho, Pd, rz);
+    return ll;
+  }
+};
+
+Polyserial optim_polyserial(
+    const Eigen::VectorXd& X,
+    const Eigen::VectorXd& D,
+    double correct = 1e-08
+) {
+  // Filter and correct
+  Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, D);
+  Eigen::VectorXd x = filter(X, pco);
+  Eigen::VectorXd d = correct_data(filter(D, pco));
+  
+  // Define the initial point for the optimization: Pearson's coefficient
+  int n = 1;
+  Eigen::VectorXd x0 = Eigen::VectorXd::Constant(n, cor_pearson(x, d));
+  
+  // Set the optimization parameters
+  LBFGSpp::LBFGSBParam<double> params;
+  params.max_iterations = 20;
+  params.epsilon = 1e-8;
+  params.delta = 1e-8;
+  params.max_step = 1e20;
+  params.min_step = 1e-20;
+  Eigen::VectorXd lb = Eigen::VectorXd::Constant(n, -1.);
+  Eigen::VectorXd ub = Eigen::VectorXd::Constant(n,  1.);
+  
+  // Create solver and function object
+  LBFGSpp::LBFGSBSolver<double, LBFGSpp::LineSearchMoreThuente> solver(params);
+  Polyserial poly(x, d, correct);
+  
+  // Run the optimization
+  double f = 0.0;
+  Eigen::VectorXd rho = x0;
+  int niter = solver.minimize(poly, rho, f, lb, ub);
+  
+  // Return the optimal value of rho and other estimated parameters
+  poly.rho = rho(0);
+  
+  return poly;
+}
+
+// [[Rcpp::export(.cor_polyserial)]]
+double cor_polyserial(
+    const Eigen::VectorXd& x,
+    const Eigen::VectorXd& d,
+    const double& correct = 1e-08
+) {
+  Polyserial correlation = optim_polyserial(x, d, correct);
+  return correlation.rho;
+}
+
+// [[Rcpp::export(.cor_polyserial_full)]]
+Rcpp::List cor_polyserial_full(
+    const Eigen::VectorXd& x,
+    const Eigen::VectorXd& d,
+    const double& correct = 1e-08
+) {
+  Polyserial correlation = optim_polyserial(x, d, correct);
+  
+  double pval = std::max(2e-16, poly_pval(correlation.rho, d.size()));
+  // Parameters
+  Rcpp::List params = Rcpp::List::create(
+    Rcpp::Named("tau") = correlation.tau,
+    Rcpp::Named("mu") = correlation.mu,
+    Rcpp::Named("sigma") = correlation.sigma
+  );
+  
+  Rcpp::List res = Rcpp::List::create(
+    Rcpp::Named("rho") = correlation.rho,
+    Rcpp::Named("pval") = pval,
+    Rcpp::Named("parameters") = params
+  );
+  res.attr("class") = "polyserial";
+  
   return res;
 }

@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# polychoric <img src="man/figures/logo.png" align="right" height="139" />
+# polychoric <img src="man/figures/logo.png" align="right" height="139" title="Created with hexSticker package" />
 
 <!-- badges: start -->
 
@@ -14,10 +14,10 @@ Fast Polychoric Correlation for Vectors and Data Frames
 
 Polychoric is a package that provides a wrapper for C++ routines used to
 calculate polychoric correlation coefficients, which are often used in
-social science or marketing research. The single `polycorr()` function
-can take in ordinal factor vectors, a contingency table, or a data frame
-and returns corresponding polychoric correlation estimates in the form
-of a single numeric value or a correlation matrix.
+social science or marketing research. The single `cor_polychoric()`
+function can take in ordinal factor vectors, a contingency table, or a
+data frame and returns corresponding polychoric correlation estimates in
+the form of a single numeric value or a correlation matrix.
 
 <details>
 <summary>
@@ -35,7 +35,7 @@ You can install the development version of polychoric from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("Marwolaeth/polychoric")
+# devtools::install_github("Marwolaeth/polychoric")
 ```
 
 ## The Purpose
@@ -44,7 +44,7 @@ Polychoric correlation coefficients are a type of correlation
 coefficient used to measure the relationship between two ordinal
 variables. They are computed by estimating the correlation between two
 underlying continuous variables that are assumed to give rise to the
-observed ordinal data. The `polycorr()` function estimates latent
+observed ordinal data. The `cor_polychoric()` function estimates latent
 Pearson correlation coefficients under the assumption that the latent
 traits of interest are standard normal random variables.
 
@@ -54,14 +54,14 @@ estimating the thresholds (here called `gamma` and `tau`, like in
 that separate the ordinal categories for each variable. These thresholds
 are used to transform the ordinal data into a set of continuous
 variables, which can then be used to estimate the correlation
-coefficient using standard methods. The `polycorr()` function currently
-estimates the thresholds using a two-step maximum likelihood estimation,
-where first the thresholds are deduced from univariate distributions of
-ordinal variables and then the `L-BFGS-B` optimization algorithm
-(implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/), *Yixuan
-2023*) is used to find the value of the correlation coefficient $\rho$
-that maximizes the likelihood of the observed contingency table. The
-`toms462` (*Donnelly 1973*, *Owen 1956*)
+coefficient using standard methods. The `cor_polychoric()` function
+currently estimates the thresholds using a two-step maximum likelihood
+estimation, where first the thresholds are deduced from univariate
+distributions of ordinal variables and then the `L-BFGS-B` optimization
+algorithm (implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/),
+*Yixuan 2023*) is used to find the value of the correlation coefficient
+$\rho$ that maximizes the likelihood of the observed contingency table.
+The `toms462` (*Donnelly 1973*, *Owen 1956*)
 [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html)
 is used to approximate the bivariate normal distribution (quadrant
 probabilities) of threshold values.
@@ -126,25 +126,25 @@ gss12_values |> as.data.frame() |> likert() |> plot()
 Coefficient only:
 
 ``` r
-polycorr(gss12_values$valorig, gss12_values$valeql)
-#> [1] 0.2373013
+cor_polychoric(gss12_values$valorig, gss12_values$valeql)
+#> [1] 0.2368615
 ```
 
 Full output:
 
 ``` r
-polycorr(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
+cor_polychoric(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
 #> $rho
-#> [1] 0.2373013
+#> [1] 0.2368615
 #> 
 #> $pval
 #> [1] 0
 #> 
 #> $gamma
-#> [1] -2.0537489 -1.4862570 -0.9486693 -0.1249568  0.5558306
+#> [1] -2.0553974 -1.4868600 -0.9489826 -0.1251581  0.5555975
 #> 
 #> $tau
-#> [1] -2.28503532 -1.89926319 -1.46841315 -0.85565031  0.01518016
+#> [1] -2.28503532 -1.90047725 -1.46900044 -0.85593837  0.01498041
 ```
 
 ### For a contingency table
@@ -167,8 +167,8 @@ polycorr(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
 #>   Somewhat like me                 57     122               146
 #>   Like me                          32     126               144
 #>   Very much like me                28      73               245
-polycorr(G)
-#> [1] 0.2373013
+cor_polychoric(G)
+#> [1] 0.2368615
 # side with psych:polychoric()
 psych::polychoric(G, correct = .1)$rho
 #> [1] "You seem to have a table, I will return just one correlation."
@@ -178,18 +178,18 @@ psych::polychoric(G, correct = .1)$rho
 Notice that threshold values are exactly the same for both functions:
 
 ``` r
-polycorr(G, coef.only = FALSE)
+cor_polychoric(G, coef.only = FALSE)
 #> $rho
-#> [1] 0.2373013
+#> [1] 0.2368615
 #> 
 #> $pval
 #> [1] 0
 #> 
 #> $gamma
-#> [1] -2.0537489 -1.4862570 -0.9486693 -0.1249568  0.5558306
+#> [1] -2.0553974 -1.4868600 -0.9489826 -0.1251581  0.5555975
 #> 
 #> $tau
-#> [1] -2.28503532 -1.89926319 -1.46841315 -0.85565031  0.01518016
+#> [1] -2.28503532 -1.90047725 -1.46900044 -0.85593837  0.01498041
 # side with psych:polychoric()
 psych::polychoric(G, correct = .1)
 #> [1] "You seem to have a table, I will return just one correlation."
@@ -215,95 +215,95 @@ psych::polychoric(G, correct = .1)
 ### For a data frame
 
 ``` r
-polycorr(gss12_values)
-#>             valorig      valrich      valeql     valable     valsafe    valdiff
-#> valorig 1.000000000  0.118727899  0.23720932 0.198826228  0.09122160 0.33009188
-#> valrich 0.118727899  1.000000000 -0.04670283 0.314855307  0.11449561 0.15734039
-#> valeql  0.237209319 -0.046702826  1.00000000 0.152347685  0.27109827 0.23579441
-#> valable 0.198826228  0.314855307  0.15234769 1.000000000  0.25724803 0.26873818
-#> valsafe 0.091221604  0.114495612  0.27109827 0.257248028  1.00000000 0.09667473
-#> valdiff 0.330091881  0.157340389  0.23579441 0.268738180  0.09667473 1.00000000
-#> valrule 0.002356917  0.037900004  0.16856652 0.118925545  0.34782606 0.07653565
-#> vallist 0.265863725 -0.060131075  0.40205032 0.118897693  0.19851827 0.30572543
-#> valmod  0.065341396 -0.092318870  0.27979906 0.004315369  0.33988137 0.08395914
-#> valspl  0.179090630  0.422710781  0.07215105 0.341625050  0.14601642 0.37659866
-#> valfree 0.297702063  0.117488273  0.27639313 0.238781963  0.23355602 0.27087017
-#> valcare 0.284574168 -0.012780705  0.34613377 0.229023494  0.26225173 0.28156361
-#> valachv 0.176897814  0.435748809  0.04550866 0.598242106  0.25606699 0.30619855
-#> valdfnd 0.119524864  0.137466455  0.25764576 0.215812607  0.41302554 0.20515139
-#> valrisk 0.242389857  0.270846010  0.13361100 0.264848486 -0.12028162 0.54997437
-#> valprpr 0.005499929  0.069487853  0.19758133 0.140964722  0.37132506 0.09346525
-#> valrspt 0.051196292  0.231740596 -0.01843000 0.365979099  0.22261496 0.07091980
-#> valdvot 0.202168094 -0.048163892  0.25121898 0.202937085  0.18972724 0.21528460
-#> valeco  0.148632767 -0.129771959  0.26685311 0.048357793  0.12169972 0.22177562
-#> valtrdn 0.045813505 -0.002720963  0.10519838 0.079775750  0.22631019 0.11944924
-#> valfun  0.198961969  0.157957458  0.16463518 0.234119747  0.12420461 0.40766337
-#>              valrule     vallist       valmod      valspl    valfree    valcare
-#> valorig  0.002356917  0.26586373  0.065341396  0.17909063 0.29770206  0.2845742
-#> valrich  0.037900004 -0.06013107 -0.092318870  0.42271078 0.11748827 -0.0127807
-#> valeql   0.168566524  0.40205032  0.279799058  0.07215105 0.27639313  0.3461338
-#> valable  0.118925545  0.11889769  0.004315369  0.34162505 0.23878196  0.2290235
-#> valsafe  0.347826058  0.19851827  0.339881370  0.14601642 0.23355602  0.2622517
-#> valdiff  0.076535649  0.30572543  0.083959141  0.37659866 0.27087017  0.2815636
-#> valrule  1.000000000  0.17422736  0.341218252  0.03064617 0.05171472  0.2408288
-#> vallist  0.174227365  1.00000000  0.351686462  0.09780635 0.31545940  0.4203815
-#> valmod   0.341218252  0.35168646  1.000000000 -0.01567523 0.12230657  0.3460787
-#> valspl   0.030646174  0.09780635 -0.015675227  1.00000000 0.30443727  0.1354547
-#> valfree  0.051714718  0.31545940  0.122306570  0.30443727 1.00000000  0.3079972
-#> valcare  0.240828785  0.42038151  0.346078695  0.13545468 0.30799718  1.0000000
-#> valachv  0.169349875  0.14026398  0.029387129  0.44698453 0.25853954  0.2718955
-#> valdfnd  0.384303749  0.24300727  0.263776908  0.17267243 0.21428278  0.3335383
-#> valrisk -0.053650113  0.14192225 -0.006674191  0.44832716 0.25180118  0.1661776
-#> valprpr  0.520076905  0.19754954  0.373712529  0.09281485 0.08451273  0.2716698
-#> valrspt  0.278185722  0.10379211  0.059494292  0.27570734 0.25023311  0.1974274
-#> valdvot  0.212508588  0.37434998  0.216969234  0.18836975 0.29333998  0.4469105
-#> valeco   0.120073096  0.33165855  0.198905933  0.04656649 0.21108989  0.3167773
-#> valtrdn  0.329400314  0.13744877  0.232702487  0.10459957 0.06650694  0.3133155
-#> valfun   0.105557504  0.16963226  0.063512491  0.48045909 0.27297785  0.2120011
-#>            valachv   valdfnd      valrisk      valprpr     valrspt     valdvot
-#> valorig 0.17689781 0.1195249  0.242389857  0.005499929  0.05119629  0.20216809
-#> valrich 0.43574881 0.1374665  0.270846010  0.069487853  0.23174060 -0.04816389
-#> valeql  0.04550866 0.2576458  0.133611002  0.197581331 -0.01843000  0.25121898
-#> valable 0.59824211 0.2158126  0.264848486  0.140964722  0.36597910  0.20293708
-#> valsafe 0.25606699 0.4130255 -0.120281615  0.371325057  0.22261496  0.18972724
-#> valdiff 0.30619855 0.2051514  0.549974372  0.093465247  0.07091980  0.21528460
-#> valrule 0.16934988 0.3843037 -0.053650113  0.520076905  0.27818572  0.21250859
-#> vallist 0.14026398 0.2430073  0.141922249  0.197549540  0.10379211  0.37434998
-#> valmod  0.02938713 0.2637769 -0.006674191  0.373712529  0.05949429  0.21696923
-#> valspl  0.44698453 0.1726724  0.448327164  0.092814851  0.27570734  0.18836975
-#> valfree 0.25853954 0.2142828  0.251801180  0.084512731  0.25023311  0.29333998
-#> valcare 0.27189555 0.3335383  0.166177580  0.271669779  0.19742740  0.44691052
-#> valachv 1.00000000 0.3258523  0.359208776  0.227881733  0.38756144  0.12221508
-#> valdfnd 0.32585232 1.0000000  0.120536665  0.424709520  0.22164851  0.26399440
-#> valrisk 0.35920878 0.1205367  1.000000000 -0.013974051  0.16479278  0.16231741
-#> valprpr 0.22788173 0.4247095 -0.013974051  1.000000000  0.22202503  0.28593528
-#> valrspt 0.38756144 0.2216485  0.164792783  0.222025031  1.00000000  0.21605148
-#> valdvot 0.12221508 0.2639944  0.162317413  0.285935279  0.21605148  1.00000000
-#> valeco  0.05029329 0.2486996  0.129843903  0.175608805  0.06210243  0.32745212
-#> valtrdn 0.09149786 0.3670784 -0.005258625  0.383678398  0.13390411  0.32365933
-#> valfun  0.27783825 0.3053171  0.430377570  0.153299415  0.17792231  0.28939373
-#>              valeco      valtrdn     valfun
-#> valorig  0.14863277  0.045813505 0.19896197
-#> valrich -0.12977196 -0.002720963 0.15795746
-#> valeql   0.26685311  0.105198375 0.16463518
-#> valable  0.04835779  0.079775750 0.23411975
-#> valsafe  0.12169972  0.226310195 0.12420461
-#> valdiff  0.22177562  0.119449236 0.40766337
-#> valrule  0.12007310  0.329400314 0.10555750
-#> vallist  0.33165855  0.137448766 0.16963226
-#> valmod   0.19890593  0.232702487 0.06351249
-#> valspl   0.04656649  0.104599569 0.48045909
-#> valfree  0.21108989  0.066506938 0.27297785
-#> valcare  0.31677728  0.313315503 0.21200108
-#> valachv  0.05029329  0.091497862 0.27783825
-#> valdfnd  0.24869962  0.367078389 0.30531709
-#> valrisk  0.12984390 -0.005258625 0.43037757
-#> valprpr  0.17560881  0.383678398 0.15329942
-#> valrspt  0.06210243  0.133904109 0.17792231
-#> valdvot  0.32745212  0.323659328 0.28939373
-#> valeco   1.00000000  0.239031823 0.17905717
-#> valtrdn  0.23903182  1.000000000 0.24959307
-#> valfun   0.17905717  0.249593070 1.00000000
+cor_polychoric(gss12_values)
+#>             valorig      valrich      valeql    valable     valsafe    valdiff
+#> valorig 1.000000000  0.118727899  0.23686149 0.19882623  0.09122160 0.33043064
+#> valrich 0.118727899  1.000000000 -0.04645770 0.31591878  0.11489494 0.15734039
+#> valeql  0.236861489 -0.046457697  1.00000000 0.15255434  0.27102841 0.23579441
+#> valable 0.198826227  0.315918776  0.15255434 1.00000000  0.25724803 0.26873818
+#> valsafe 0.091221604  0.114894942  0.27102841 0.25724803  1.00000000 0.09667473
+#> valdiff 0.330430639  0.157340388  0.23579441 0.26873818  0.09667473 1.00000000
+#> valrule 0.002356917  0.037900001  0.16856652 0.11892555  0.34782606 0.07653565
+#> vallist 0.265726259 -0.059919866  0.40201437 0.11889769  0.19841235 0.30571177
+#> valmod  0.065341395 -0.092318870  0.27911663 0.00431537  0.33988137 0.08363167
+#> valspl  0.179090630  0.423724657  0.07215105 0.34162505  0.14601642 0.37659866
+#> valfree 0.297208803  0.119652724  0.27571627 0.23878197  0.23369401 0.27069457
+#> valcare 0.284863397 -0.010611690  0.34551659 0.22938100  0.26178436 0.28215155
+#> valachv 0.176897814  0.436578781  0.04494343 0.59889140  0.25606699 0.30619855
+#> valdfnd 0.119060942  0.137882895  0.25723476 0.21626692  0.41302554 0.20515139
+#> valrisk 0.242786604  0.270846009  0.13361100 0.26484849 -0.12028161 0.55059730
+#> valprpr 0.004973599  0.069830218  0.19714525 0.14096472  0.37132506 0.09346525
+#> valrspt 0.051196292  0.231740598 -0.01843000 0.36597910  0.22317849 0.07091980
+#> valdvot 0.201466469 -0.046607247  0.24971182 0.20355778  0.18914659 0.21522228
+#> valeco  0.148133027 -0.129741610  0.26659211 0.04824265  0.12134264 0.22177562
+#> valtrdn 0.045333900 -0.002720963  0.10519837 0.07977575  0.22631019 0.11944924
+#> valfun  0.198961969  0.158551301  0.16463518 0.23411975  0.12420461 0.40766337
+#>              valrule     vallist       valmod      valspl    valfree
+#> valorig  0.002356917  0.26572626  0.065341395  0.17909063 0.29720880
+#> valrich  0.037900001 -0.05991987 -0.092318870  0.42372466 0.11965272
+#> valeql   0.168566524  0.40201437  0.279116632  0.07215105 0.27571627
+#> valable  0.118925545  0.11889769  0.004315370  0.34162505 0.23878197
+#> valsafe  0.347826057  0.19841235  0.339881369  0.14601642 0.23369401
+#> valdiff  0.076535649  0.30571177  0.083631673  0.37659866 0.27069457
+#> valrule  1.000000000  0.17454569  0.341218252  0.03064617 0.05191878
+#> vallist  0.174545692  1.00000000  0.351268411  0.09785445 0.31528897
+#> valmod   0.341218252  0.35126841  1.000000000 -0.01567523 0.12093125
+#> valspl   0.030646174  0.09785445 -0.015675228  1.00000000 0.30570996
+#> valfree  0.051918784  0.31528897  0.120931247  0.30570996 1.00000000
+#> valcare  0.241301604  0.41987814  0.346280470  0.13626551 0.30733023
+#> valachv  0.169349875  0.14078039  0.029046367  0.44698453 0.25879039
+#> valdfnd  0.384303748  0.24238726  0.263548607  0.17267243 0.21402072
+#> valrisk -0.053650113  0.14249683 -0.006674191  0.44832716 0.25301084
+#> valprpr  0.520358756  0.19754954  0.373712528  0.09281485 0.08336381
+#> valrspt  0.278185722  0.10438393  0.059494292  0.27570734 0.25155888
+#> valdvot  0.212123748  0.37380957  0.215858371  0.18862366 0.29329799
+#> valeco   0.120073095  0.33163867  0.198688457  0.04656644 0.21025500
+#> valtrdn  0.329400314  0.13710998  0.232702487  0.10459957 0.06616966
+#> valfun   0.105557503  0.16972583  0.063512491  0.48110530 0.27333191
+#>             valcare    valachv   valdfnd      valrisk      valprpr     valrspt
+#> valorig  0.28486340 0.17689781 0.1190609  0.242786604  0.004973599  0.05119629
+#> valrich -0.01061169 0.43657878 0.1378829  0.270846009  0.069830218  0.23174060
+#> valeql   0.34551659 0.04494343 0.2572348  0.133611002  0.197145248 -0.01843000
+#> valable  0.22938100 0.59889140 0.2162669  0.264848486  0.140964722  0.36597910
+#> valsafe  0.26178436 0.25606699 0.4130255 -0.120281615  0.371325056  0.22317849
+#> valdiff  0.28215155 0.30619855 0.2051514  0.550597303  0.093465247  0.07091980
+#> valrule  0.24130160 0.16934988 0.3843037 -0.053650113  0.520358756  0.27818572
+#> vallist  0.41987814 0.14078039 0.2423873  0.142496832  0.197549540  0.10438393
+#> valmod   0.34628047 0.02904637 0.2635486 -0.006674191  0.373712528  0.05949429
+#> valspl   0.13626551 0.44698453 0.1726724  0.448327163  0.092814851  0.27570734
+#> valfree  0.30733023 0.25879039 0.2140207  0.253010842  0.083363810  0.25155888
+#> valcare  1.00000000 0.27259763 0.3336151  0.167791356  0.271697223  0.19858149
+#> valachv  0.27259763 1.00000000 0.3258523  0.359208775  0.227881733  0.38756143
+#> valdfnd  0.33361510 0.32585232 1.0000000  0.120536665  0.424709519  0.22222162
+#> valrisk  0.16779136 0.35920878 0.1205367  1.000000000 -0.013974051  0.16479278
+#> valprpr  0.27169722 0.22788173 0.4247095 -0.013974051  1.000000000  0.22202503
+#> valrspt  0.19858149 0.38756143 0.2222216  0.164792782  0.222025030  1.00000000
+#> valdvot  0.44608286 0.12198850 0.2639067  0.163152896  0.286130764  0.21683784
+#> valeco   0.31674033 0.05029329 0.2487177  0.129998877  0.175597155  0.06206173
+#> valtrdn  0.31352715 0.09149786 0.3670784 -0.005258625  0.383678397  0.13390411
+#> valfun   0.21246223 0.27783825 0.3053171  0.430985534  0.153299415  0.17792237
+#>             valdvot      valeco      valtrdn     valfun
+#> valorig  0.20146647  0.14813303  0.045333900 0.19896197
+#> valrich -0.04660725 -0.12974161 -0.002720963 0.15855130
+#> valeql   0.24971182  0.26659211  0.105198375 0.16463518
+#> valable  0.20355778  0.04824265  0.079775750 0.23411975
+#> valsafe  0.18914659  0.12134264  0.226310194 0.12420461
+#> valdiff  0.21522228  0.22177562  0.119449236 0.40766337
+#> valrule  0.21212375  0.12007310  0.329400314 0.10555750
+#> vallist  0.37380957  0.33163867  0.137109984 0.16972583
+#> valmod   0.21585837  0.19868846  0.232702487 0.06351249
+#> valspl   0.18862366  0.04656644  0.104599569 0.48110530
+#> valfree  0.29329799  0.21025500  0.066169657 0.27333191
+#> valcare  0.44608286  0.31674033  0.313527147 0.21246223
+#> valachv  0.12198850  0.05029329  0.091497862 0.27783825
+#> valdfnd  0.26390674  0.24871768  0.367078389 0.30531709
+#> valrisk  0.16315290  0.12999888 -0.005258625 0.43098553
+#> valprpr  0.28613076  0.17559716  0.383678397 0.15329941
+#> valrspt  0.21683784  0.06206173  0.133904109 0.17792237
+#> valdvot  1.00000000  0.32678791  0.323819049 0.28988487
+#> valeco   0.32678791  1.00000000  0.239031822 0.17905717
+#> valtrdn  0.32381905  0.23903182  1.000000000 0.24959307
+#> valfun   0.28988487  0.17905717  0.249593069 1.00000000
 ```
 
 Let’s visualise and compare our matrices. We suggest `pheatmap` package
@@ -316,7 +316,7 @@ if (!require(pheatmap)) {
   library(pheatmap)
 }
 #> Loading required package: pheatmap
-rho1 <- polycorr(gss12_values)
+rho1 <- cor_polychoric(gss12_values)
 # psych::polychoric() doesn't work with factor data directly
 gss_num <- gss12_values |> lapply(as.integer) |> as.data.frame()
 rho2 <- polychoric(gss_num)
@@ -361,9 +361,9 @@ polychoric correlation matrix
 
 ### Handling mixed variable types
 
-The `polycorr()` function is currently limited in its flexibility as it
-only provides polychoric estimation for ordinal variables and does not
-support biserial or polyserial estimation for mixed ordinal and
+The `cor_polychoric()` function is currently limited in its flexibility
+as it only provides polychoric estimation for ordinal variables and does
+not support biserial or polyserial estimation for mixed ordinal and
 continuous variables. The function does, however, attempt to recognise
 potentially non-discrete variables, allowing for up to 10 levels, like
 in [World Values Survey](https://www.worldvaluessurvey.org/wvs.jsp)
@@ -371,23 +371,40 @@ questionnaire items. In comparison, the `polychoric()` function from the
 `psych` package allows up to 8 levels by default.
 
 It’s worth noting that variables with a high number of distinct values
-may cause estimation issues, so the `polycorr()` function returns
+may cause estimation issues, so the `cor_polychoric()` function returns
 Spearman’s $\rho$ instead (with a warning).
 
 ``` r
 x <- rnorm(nrow(gss12_values))
-polycorr(gss12_values$valspl, x)
-#> Warning in .poly_xy(x, y, correct = correct): Too many levels or continuous
+cor_polychoric(gss12_values$valspl, x)
+#> Warning in .poly_xy(x, d, correct = correct): Too many levels or continuous
 #> input: returning Spearman's rho
-#> [1] 0.06076445
+#> [1] -0.01417053
 ```
+
+### Polyserial correlation
+
+Alternatively, one can correlate a continuous and an ordinal variable
+explicitly using polyserial correlation. The `polychoric` package
+contains `cor_polyserial()` function that estimates polyserial
+correlation coefficients between a continuous and an ordinal variable.
+
+``` r
+x <- rnorm(nrow(gss12_values))
+cor_polyserial(x, gss12_values$valspl)
+#> [1] -0.01237979
+```
+
+Due to its strong bivariate normality assumptions, `cor_polyserial()`
+is currently not a default choice for a mixed continuous-ordinal
+variable correlation.
 
 ### Handling missing values
 
-The `polycorr()` function always uses pairwise complete observations.
-Therefore, the user need not worry about missing data. However,
-depending on the analysis design and the ratio of missing data, it may
-be essential to check for patterns of missingness and consider
+The `cor_polychoric()` function always uses pairwise complete
+observations. Therefore, the user need not worry about missing data.
+However, depending on the analysis design and the ratio of missing data,
+it may be essential to check for patterns of missingness and consider
 imputation.
 
 The General Social Survey Schwartz Values Module dataset is cleared of
@@ -409,61 +426,61 @@ mask <- matrix(
 gss_miss[!mask] <- NA
 summary(gss_miss)
 #>                valorig                  valrich                   valeql   
-#>  Not like me at all: 22   Not like me at all:185   Not like me at all: 13  
-#>  Not like me       : 55   Not like me       :459   Not like me       : 21  
-#>  A little like me  :116   A little like me  :220   A little like me  : 47  
-#>  Somewhat like me  :317   Somewhat like me  :159   Somewhat like me  :139  
-#>  Like me           :298   Like me           : 70   Like me           :344  
-#>  Very much like me :321   Very much like me : 59   Very much like me :563  
-#>  NA's              :126   NA's              :103   NA's              :128  
+#>  Not like me at all: 23   Not like me at all:183   Not like me at all: 12  
+#>  Not like me       : 55   Not like me       :445   Not like me       : 20  
+#>  A little like me  :115   A little like me  :222   A little like me  : 44  
+#>  Somewhat like me  :325   Somewhat like me  :154   Somewhat like me  :135  
+#>  Like me           :304   Like me           : 73   Like me           :355  
+#>  Very much like me :335   Very much like me : 59   Very much like me :562  
+#>  NA's              : 98   NA's              :119   NA's              :127  
 #>                valable                  valsafe                  valdiff   
-#>  Not like me at all: 48   Not like me at all: 28   Not like me at all: 37  
-#>  Not like me       :181   Not like me       :120   Not like me       :131  
-#>  A little like me  :191   A little like me  :133   A little like me  :172  
-#>  Somewhat like me  :276   Somewhat like me  :220   Somewhat like me  :290  
-#>  Like me           :247   Like me           :328   Like me           :264  
-#>  Very much like me :170   Very much like me :311   Very much like me :217  
-#>  NA's              :142   NA's              :115   NA's              :144  
+#>  Not like me at all: 46   Not like me at all: 27   Not like me at all: 40  
+#>  Not like me       :187   Not like me       :114   Not like me       :129  
+#>  A little like me  :197   A little like me  :138   A little like me  :170  
+#>  Somewhat like me  :271   Somewhat like me  :227   Somewhat like me  :292  
+#>  Like me           :239   Like me           :299   Like me           :266  
+#>  Very much like me :184   Very much like me :320   Very much like me :223  
+#>  NA's              :131   NA's              :130   NA's              :135  
 #>                valrule                  vallist                   valmod   
-#>  Not like me at all: 69   Not like me at all: 12   Not like me at all: 17  
-#>  Not like me       :190   Not like me       : 29   Not like me       : 62  
-#>  A little like me  :175   A little like me  : 89   A little like me  :114  
-#>  Somewhat like me  :243   Somewhat like me  :203   Somewhat like me  :247  
-#>  Like me           :267   Like me           :458   Like me           :416  
-#>  Very much like me :189   Very much like me :317   Very much like me :286  
-#>  NA's              :122   NA's              :147   NA's              :113  
+#>  Not like me at all: 65   Not like me at all: 12   Not like me at all: 16  
+#>  Not like me       :184   Not like me       : 28   Not like me       : 62  
+#>  A little like me  :167   A little like me  : 96   A little like me  :112  
+#>  Somewhat like me  :240   Somewhat like me  :215   Somewhat like me  :254  
+#>  Like me           :276   Like me           :448   Like me           :403  
+#>  Very much like me :184   Very much like me :328   Very much like me :283  
+#>  NA's              :139   NA's              :128   NA's              :125  
 #>                 valspl                  valfree                  valcare   
-#>  Not like me at all: 70   Not like me at all:  9   Not like me at all:  6  
-#>  Not like me       :294   Not like me       : 40   Not like me       :  8  
-#>  A little like me  :233   A little like me  : 83   A little like me  : 64  
-#>  Somewhat like me  :245   Somewhat like me  :173   Somewhat like me  :201  
-#>  Like me           :168   Like me           :367   Like me           :415  
-#>  Very much like me :104   Very much like me :449   Very much like me :437  
-#>  NA's              :141   NA's              :134   NA's              :124  
+#>  Not like me at all: 77   Not like me at all:  8   Not like me at all:  6  
+#>  Not like me       :301   Not like me       : 43   Not like me       :  9  
+#>  A little like me  :233   A little like me  : 85   A little like me  : 62  
+#>  Somewhat like me  :244   Somewhat like me  :173   Somewhat like me  :198  
+#>  Like me           :182   Like me           :370   Like me           :428  
+#>  Very much like me :104   Very much like me :460   Very much like me :433  
+#>  NA's              :114   NA's              :116   NA's              :119  
 #>                valachv                  valdfnd                  valrisk   
-#>  Not like me at all: 53   Not like me at all: 28   Not like me at all: 84  
-#>  Not like me       :229   Not like me       :103   Not like me       :272  
-#>  A little like me  :198   A little like me  :126   A little like me  :190  
-#>  Somewhat like me  :261   Somewhat like me  :200   Somewhat like me  :284  
-#>  Like me           :228   Like me           :381   Like me           :181  
-#>  Very much like me :160   Very much like me :296   Very much like me :121  
-#>  NA's              :126   NA's              :121   NA's              :123  
+#>  Not like me at all: 52   Not like me at all: 28   Not like me at all: 89  
+#>  Not like me       :226   Not like me       : 97   Not like me       :278  
+#>  A little like me  :197   A little like me  :124   A little like me  :188  
+#>  Somewhat like me  :260   Somewhat like me  :203   Somewhat like me  :274  
+#>  Like me           :225   Like me           :378   Like me           :178  
+#>  Very much like me :164   Very much like me :305   Very much like me :114  
+#>  NA's              :131   NA's              :120   NA's              :134  
 #>                valprpr                  valrspt                  valdvot   
-#>  Not like me at all: 43   Not like me at all: 51   Not like me at all:  5  
-#>  Not like me       :148   Not like me       :275   Not like me       : 15  
-#>  A little like me  :176   A little like me  :197   A little like me  : 57  
-#>  Somewhat like me  :246   Somewhat like me  :314   Somewhat like me  :176  
-#>  Like me           :306   Like me           :199   Like me           :413  
-#>  Very much like me :217   Very much like me : 85   Very much like me :460  
-#>  NA's              :119   NA's              :134   NA's              :129  
+#>  Not like me at all: 35   Not like me at all: 54   Not like me at all:  4  
+#>  Not like me       :154   Not like me       :275   Not like me       : 15  
+#>  A little like me  :165   A little like me  :198   A little like me  : 60  
+#>  Somewhat like me  :249   Somewhat like me  :322   Somewhat like me  :183  
+#>  Like me           :301   Like me           :197   Like me           :412  
+#>  Very much like me :215   Very much like me : 78   Very much like me :463  
+#>  NA's              :136   NA's              :131   NA's              :118  
 #>                 valeco                  valtrdn                   valfun   
-#>  Not like me at all: 12   Not like me at all: 45   Not like me at all: 25  
-#>  Not like me       : 47   Not like me       :123   Not like me       :122  
-#>  A little like me  :127   A little like me  :155   A little like me  :236  
-#>  Somewhat like me  :247   Somewhat like me  :245   Somewhat like me  :281  
-#>  Like me           :378   Like me           :306   Like me           :279  
-#>  Very much like me :320   Very much like me :244   Very much like me :183  
-#>  NA's              :124   NA's              :137   NA's              :129
+#>  Not like me at all: 12   Not like me at all: 49   Not like me at all: 20  
+#>  Not like me       : 45   Not like me       :119   Not like me       :126  
+#>  A little like me  :134   A little like me  :162   A little like me  :243  
+#>  Somewhat like me  :245   Somewhat like me  :245   Somewhat like me  :274  
+#>  Like me           :383   Like me           :320   Like me           :285  
+#>  Very much like me :311   Very much like me :244   Very much like me :178  
+#>  NA's              :125   NA's              :116   NA's              :129
 ```
 
 Let’s rerun the estimation: the function works, though coefficients may
@@ -471,7 +488,7 @@ be different.
 
 ``` r
 pheatmap(
-  polycorr(gss_miss),
+  cor_polychoric(gss_miss),
   cluster_rows = FALSE,
   cluster_cols = FALSE,
   display_numbers = TRUE,
@@ -500,16 +517,23 @@ if (!require(microbenchmark)) {
 #> Loading required package: microbenchmark
 bm <- microbenchmark(
   standard = polychoric(gss_num),
-  polycorr = polycorr(gss12_values),
+  cor_polychoric = cor_polychoric(gss12_values),
   times = 32L,
   control = list(warmup = 6)
 )
 bm
 #> Unit: milliseconds
-#>      expr       min        lq      mean    median        uq       max neval cld
-#>  standard 2628.1189 2664.5927 2698.8901 2691.3754 2729.0148 2849.2303    32  a 
-#>  polycorr  180.2117  181.2195  183.9262  182.1748  184.8666  198.3651    32   b
+#>            expr      min        lq      mean    median       uq       max neval
+#>        standard 2401.933 2437.8827 2461.1264 2456.8466 2476.587 2596.6234    32
+#>  cor_polychoric  183.503  184.6935  186.6415  186.2362  187.512  195.4018    32
+#>  cld
+#>   a 
+#>    b
 ```
+
+Another minor advantage of the `polychoric` package is that its
+functions accept ordinal factor variables without need to convert them
+explicitly.
 
 ## Development
 
@@ -523,8 +547,7 @@ Please report any issues you came up with on the
 The upcoming steps
 </summary>
 
-1.  Provide a polyserial correlation estimation function.
-2.  Implement (optional) more robust distributional assumptions, e.g. a
+1.  Implement (optional) more robust distributional assumptions, e.g. a
     skew normal distribution (*Jin and Yang-Wallentin 2017*).
     </details>
 

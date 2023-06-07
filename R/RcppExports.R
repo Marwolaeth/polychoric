@@ -25,3 +25,11 @@
     .Call(`_polychoric_poly_df_full`, X, correct)
 }
 
+.cor_polyserial <- function(x, d, correct = 1e-08) {
+    .Call(`_polychoric_cor_polyserial`, x, d, correct)
+}
+
+.cor_polyserial_full <- function(x, d, correct = 1e-08) {
+    .Call(`_polychoric_cor_polyserial_full`, x, d, correct)
+}
+

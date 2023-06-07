@@ -42,8 +42,8 @@ df <- data.frame(
 head(df, 13)
 
 #### Correlate ----
-polycorr(df)
-polycorr(df, coef.only = FALSE)
+cor_polychoric(df)
+cor_polychoric(df, coef.only = FALSE)
 
 #### Missing values ----
 df_miss <- df
@@ -53,13 +53,13 @@ mask <- matrix(
 )
 df_miss[!mask] <- NA
 summary(df_miss)
-polycorr(df_miss)
-polycorr(df_miss, coef.only = FALSE)
+cor_polychoric(df_miss)
+cor_polychoric(df_miss, coef.only = FALSE)
 
 #### Correlate + continuous ----
 df$c1 <- rlnorm(n, 4, .4)
 head(df, 13)
-polycorr(df)
+cor_polychoric(df)
 
 ## POLYSERIAL CORRELATION ----
 
@@ -78,36 +78,42 @@ df$d <- cut(df$y, breaks = 5, labels = likert5_lvls, ordered_result = TRUE)
 summary(df)
 
 #### Test correlations ----
-polychoric(table(df$c, df$d), correct = .1)
-polycorr(df$c, df$d)
-psych::polyserial(df$y, df[,3:4] |> lapply(as.integer) |> as.data.frame())
-polyserial_(df$y, df$c)
-polycorr(df$y, df$c)
+cor_polyserial(df$x, df$d)
+cor_polyserial(df$x, df$c)
+cor_polyserial(df$y, df$d)
+psych::polyserial(df$x, df[,3:4] |> lapply(as.integer) |> as.data.frame())
+
+bm_ps <- microbenchmark(
+  standard = polyserial(df$x, df[,3:4] |> lapply(as.integer) |> as.data.frame()),
+  polyseri = cor_polyserial_full(df$x, df$d),
+  times = 26L,
+  control = list(warmup = 3L)
+)
+bm_ps
+
+x <- df$x
+d <- df$d
+x[sample(1:200, 6)] <- NaN
+d[sample(1:200, 6)] <- NA
+
+cor_polyserial(x, d)
+cor_polyserial(x, d, coef.only = FALSE)
 
 ## GSS 2012 SCHWARTZ VALUES MODULE ----
 data("gss12_values", package = 'polychoric')
 
 #### A pair of discrete vectors ----
-polycorr(gss12_values$valorig, gss12_values$valeql)
-polycorr(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
+cor_polychoric(gss12_values$valorig, gss12_values$valeql)
+cor_polychoric(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
 
 #### A contingency table ----
 (G <- table(gss12_values$valorig, gss12_values$valeql))
-polycorr(G)
-
-#### A data.frame ----
-polycorr(gss12_values)
-.poly_df_full(gss12_values)
-
-#### Mixed variable types ----
-# For safety, returns Spearman's rho if at least one of the vectors
-# is presumably continuous (n_distinct(x) > 10 | n_distinct(y) > 10)
-x <- rnorm(nrow(gss12_values))
-polycorr(gss12_values$valspl, x)
+cor_polychoric(G)
 
 ## IN LIBRARY ----
 library(polychoric)
-?polycorr
+?cor_polychoric
+?cor_polyserial
 
 ## BENCHMARK ----
 library(microbenchmark)
@@ -118,7 +124,7 @@ gc()
 
 bm <- microbenchmark(
   standard = polychoric(gss_num),
-  polycorr = polycorr(gss12_values, coef.only = FALSE),
+  cor_polychoric = cor_polychoric(gss12_values, coef.only = FALSE),
   times = 32L,
   control = list(warmup = 6)
 )
@@ -126,7 +132,7 @@ bm
 
 bm_xy <- microbenchmark(
   standard = polychoric(table(gss12_values$valorig, gss12_values$valeql)),
-  polycorr = polycorr(gss12_values$valorig, gss12_values$valeql),
+  cor_polychoric = cor_polychoric(gss12_values$valorig, gss12_values$valeql),
   times = 32L,
   control = list(warmup = 6)
 )

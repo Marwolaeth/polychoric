@@ -20,8 +20,10 @@ check(document = TRUE, remote = TRUE, cran = TRUE)
 # use_data(gss12_values)
 # useDynLib(polychoric, .registration = TRUE)
 
+# rename_files('functions.R', 'cor_polychoric.R')
+
 # use_readme_rmd()
-# build_readme()
+build_readme()
 
 install()
 pkgbuild::build(compile_attributes = TRUE)
