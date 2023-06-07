@@ -1,5 +1,7 @@
 // -*- mode: C++; c-indent-level: 4; c-basic-offset: 4; indent-tabs-mode: nil; -*-
 
+#define EIGEN_USE_BLAS
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 // [[Rcpp::depends(RcppEigen)]]
