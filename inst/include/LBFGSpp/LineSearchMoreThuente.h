@@ -232,7 +232,9 @@ public:
 
         // Make sure d points to a descent direction
         if (dg_init >= Scalar(0))
-            Rcpp::stop("the moving direction does not decrease the objective function value");
+            throw std::domain_error(
+                    "the moving direction does not decrease the objective function value"
+                );
 
         // Tolerance for convergence test
         // Sufficient decrease
@@ -366,10 +368,14 @@ public:
             step = new_step;
 
             if (step < param.min_step)
-                Rcpp::stop("the line search step became smaller than the minimum value allowed");
+                throw std::domain_error(
+                        "the line search step became smaller than the minimum value allowed"
+                    );
 
             if (step > param.max_step)
-                Rcpp::stop("the line search step became larger than the maximum value allowed");
+                throw std::domain_error(
+                        "the line search step became larger than the maximum value allowed"
+                    );
 
             // Update parameter, function value, and gradient
             x.noalias() = xp + step * drt;
@@ -424,7 +430,9 @@ public:
 
             // Then the best step size so far is I_lo, but it needs to be positive
             if (I_lo <= Scalar(0))
-                Rcpp::stop("the line search routine is unable to sufficiently decrease the function value");
+                throw std::domain_error(
+                        "the line search routine is unable to sufficiently decrease the function value"
+                    );
 
             // Return everything with _lo
             step = I_lo;
