@@ -56,4 +56,3 @@ cor_polyserial <- function(
     return(.cor_polyserial_full(x, d, correct))
   }
 }
-

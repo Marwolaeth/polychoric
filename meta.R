@@ -7,6 +7,10 @@ available::available('polychoric') # Hey!
 
 # use_git()
 # use_github()
+usethis::use_testthat(3)
+use_test()
+use_catch()
+
 pkgbuild::clean_dll()
 pkgload::load_all(compile = TRUE)
 

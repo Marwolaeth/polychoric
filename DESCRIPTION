@@ -15,14 +15,18 @@ Description: A wrapper for C++ routines for calculating polychoric and polyseria
     the p-values associated with the coefficients and estimated discretization thresholds
     for ordinal variables.
 License: MIT + file LICENSE
-Suggests: tinytest
+Suggests: 
+    testthat (>= 3.0.0),
+    tinytest,
+    xml2
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Imports: 
     Rcpp
-LinkingTo: Rcpp, RcppEigen
+LinkingTo: Rcpp, RcppEigen, testthat
 URL: https://github.com/Marwolaeth/polychoric
 BugReports: https://github.com/Marwolaeth/polychoric/issues
 Depends: 
     R (>= 4.1)
 LazyData: true
+Config/testthat/edition: 3
