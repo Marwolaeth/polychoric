@@ -22,9 +22,9 @@ check(document = TRUE, remote = TRUE, cran = TRUE)
 
 # rename_files('functions.R', 'cor_polychoric.R')
 
-# use_readme_rmd()
-build_readme()
-
 install()
 pkgbuild::build(compile_attributes = TRUE)
 pkgbuild::build(binary = TRUE, compile_attributes = TRUE)
+
+# use_readme_rmd()
+build_readme()

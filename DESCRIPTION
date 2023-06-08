@@ -1,8 +1,8 @@
 Package: polychoric
 Type: Package
-Title: Fast Polychoric Correlation for Vectors and Data Frames
-Version: 0.9
-Date: 2023-05-30
+Title: Instant Polychoric and Polyserial Correlation
+Version: 0.92
+Date: 2023-06-08
 Author: Andrej Pawluczenko
 Maintainer: Andrej Pawluczenko <a.pawluczenko@gmail.com>
 Description: A wrapper for C++ routines for calculating polychoric and polyserial
