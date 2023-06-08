@@ -8,25 +8,22 @@
 [![R-CMD-check](https://github.com/Marwolaeth/polychoric/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Marwolaeth/polychoric/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-Fast Polychoric Correlation for Vectors and Data Frames
+Instant Polychoric and Polyserial Correlation
 
 ## About
 
 Polychoric is a package that provides a wrapper for C++ routines used to
-calculate polychoric correlation coefficients, which are often used in
-social science or marketing research. The single `cor_polychoric()`
-function can take in ordinal factor vectors, a contingency table, or a
-data frame and returns corresponding polychoric correlation estimates in
-the form of a single numeric value or a correlation matrix.
+calculate polychoric and polyserial correlation coefficients, which are
+often used in social science or marketing research. The
+`cor_polychoric()` function can take in ordinal factor (possibly
+integer) vectors, a contingency table or a data frame. It returns
+corresponding polychoric correlation estimates in a form of single
+numeric value or correlation matrix.
 
-<details>
-<summary>
-Spoiler
-</summary>
-
-Pathetic amateurish craftsmanship
-
-</details>
+The `cor_polyserial()` takes exactly one continuous and one ordinal
+vector and returns a polyserial coefficient estimate. Both functions
+optionally return the p-values associated with the coefficients and
+estimated discretization thresholds for ordinal variables.
 
 ## Installation
 
@@ -48,29 +45,36 @@ observed ordinal data. The `cor_polychoric()` function estimates latent
 Pearson correlation coefficients under the assumption that the latent
 traits of interest are standard normal random variables.
 
-The computation of polychoric correlation coefficients involves
-estimating the thresholds (here called `gamma` and `tau`, like in
-(*Drasgow 1986*), or just `tau` as in `psych` package (*Revelle 2023*))
-that separate the ordinal categories for each variable. These thresholds
-are used to transform the ordinal data into a set of continuous
-variables, which can then be used to estimate the correlation
-coefficient using standard methods. The `cor_polychoric()` function
-currently estimates the thresholds using a two-step maximum likelihood
-estimation, where first the thresholds are deduced from univariate
-distributions of ordinal variables and then the `L-BFGS-B` optimization
-algorithm (implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/),
-*Yixuan 2023*) is used to find the value of the correlation coefficient
-$\rho$ that maximizes the likelihood of the observed contingency table.
-The `toms462` (*Donnelly 1973*, *Owen 1956*)
+Polyserial correlation is used to measure the relationship between a
+continuous variable and an ordinal variable. They are computed by
+estimating the correlation between the observed continuous variable and
+a latent continuous variable that is derived from the observed ordinal
+variable.
+
+The computation of both polychoric and polyserial correlation
+coefficients involves estimating the thresholds (here called `gamma` and
+`tau`, like in (*Drasgow 1986*), or just `tau` as in `psych` package
+(*Revelle 2023*)) that separate the ordinal categories for each
+variable. These thresholds are used to transform the ordinal data into a
+set of continuous variables, which can then be used to estimate the
+correlation coefficient using standard methods. The `cor_polychoric()`
+and `cor_polyserial()` functions currently estimate the coefficients
+using a two-step maximum likelihood estimation, where first the
+thresholds are deduced from univariate distributions of ordinal
+variable(s) and then the `L-BFGS-B` optimization algorithm (implemented
+in [LBFGS++](https://github.com/yixuan/LBFGSpp/), *Yixuan 2023*) is used
+to find the value of the correlation coefficient $\rho$ that maximizes
+the likelihood of the observed data. The `toms462` (*Donnelly 1973*,
+*Owen 1956*)
 [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html)
 is used to approximate the bivariate normal distribution (quadrant
-probabilities) of threshold values.
+probabilities) of threshold values in `cor_polychoric()`.
 
-Polychoric correlation coefficients are useful for analyzing data that
-involve ordinal variables, such as Likert scales or survey responses.
-They provide a measure of the strength and direction of the relationship
-between two ordinal variables, which can be useful for understanding
-patterns in the data.
+Polychoric and polyserial correlation coefficients are useful for
+analyzing data that involve ordinal variables, such as Likert scales or
+survey responses. They provide a measure of the strength and direction
+of the relationship between two ordinal variables, which can be useful
+for understanding patterns in the data.
 
 ## Example
 
@@ -170,9 +174,9 @@ cor_polychoric(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
 cor_polychoric(G)
 #> [1] 0.2368615
 # side with psych:polychoric()
-psych::polychoric(G, correct = .1)$rho
+psych::polychoric(G)$rho
 #> [1] "You seem to have a table, I will return just one correlation."
-#> [1] 0.237309
+#> [1] 0.2390625
 ```
 
 Notice that threshold values are exactly the same for both functions:
@@ -191,25 +195,25 @@ cor_polychoric(G, coef.only = FALSE)
 #> $tau
 #> [1] -2.28503532 -1.90047725 -1.46900044 -0.85593837  0.01498041
 # side with psych:polychoric()
-psych::polychoric(G, correct = .1)
+psych::polychoric(G, correct = 1e-08)
 #> [1] "You seem to have a table, I will return just one correlation."
 #> $rho
-#> [1] 0.237309
+#> [1] 0.2368683
 #> 
 #> $objective
-#> [1] 2.730677
+#> [1] 2.730125
 #> 
 #> $tau.row
 #> Not like me at all        Not like me   A little like me   Somewhat like me 
-#>         -2.0537489         -1.4862570         -0.9486693         -0.1249568 
+#>         -2.0553974         -1.4868600         -0.9489826         -0.1251581 
 #>            Like me 
-#>          0.5558306 
+#>          0.5555975 
 #> 
 #> $tau.col
 #> Not like me at all        Not like me   A little like me   Somewhat like me 
-#>        -2.28503532        -1.89926319        -1.46841315        -0.85565031 
+#>        -2.28503532        -1.90047725        -1.46900044        -0.85593837 
 #>            Like me 
-#>         0.01518016
+#>         0.01498041
 ```
 
 ### For a data frame
@@ -379,7 +383,7 @@ x <- rnorm(nrow(gss12_values))
 cor_polychoric(gss12_values$valspl, x)
 #> Warning in .poly_xy(x, d, correct = correct): Too many levels or continuous
 #> input: returning Spearman's rho
-#> [1] -0.01417053
+#> [1] 0.0518034
 ```
 
 ### Polyserial correlation
@@ -390,9 +394,12 @@ contains `cor_polyserial()` function that estimates polyserial
 correlation coefficients between a continuous and an ordinal variable.
 
 ``` r
-x <- rnorm(nrow(gss12_values))
+# Let them be actually correlated
+x <- as.integer(gss12_values$valspl) * 20.2 + rnorm(nrow(gss12_values), sd = 13)
+cor(x, as.integer(gss12_values$valspl))
+#> [1] 0.9065667
 cor_polyserial(x, gss12_values$valspl)
-#> [1] -0.01237979
+#> [1] 0.9248101
 ```
 
 Due to its strong bivariate normality assumptions, `cor_polyserial()`
@@ -424,63 +431,23 @@ mask <- matrix(
   nrow = nrow(gss_miss)
 )
 gss_miss[!mask] <- NA
-summary(gss_miss)
+summary(gss_miss[,1:4]) # Now NAs are present
 #>                valorig                  valrich                   valeql   
-#>  Not like me at all: 23   Not like me at all:183   Not like me at all: 12  
-#>  Not like me       : 55   Not like me       :445   Not like me       : 20  
-#>  A little like me  :115   A little like me  :222   A little like me  : 44  
-#>  Somewhat like me  :325   Somewhat like me  :154   Somewhat like me  :135  
-#>  Like me           :304   Like me           : 73   Like me           :355  
-#>  Very much like me :335   Very much like me : 59   Very much like me :562  
-#>  NA's              : 98   NA's              :119   NA's              :127  
-#>                valable                  valsafe                  valdiff   
-#>  Not like me at all: 46   Not like me at all: 27   Not like me at all: 40  
-#>  Not like me       :187   Not like me       :114   Not like me       :129  
-#>  A little like me  :197   A little like me  :138   A little like me  :170  
-#>  Somewhat like me  :271   Somewhat like me  :227   Somewhat like me  :292  
-#>  Like me           :239   Like me           :299   Like me           :266  
-#>  Very much like me :184   Very much like me :320   Very much like me :223  
-#>  NA's              :131   NA's              :130   NA's              :135  
-#>                valrule                  vallist                   valmod   
-#>  Not like me at all: 65   Not like me at all: 12   Not like me at all: 16  
-#>  Not like me       :184   Not like me       : 28   Not like me       : 62  
-#>  A little like me  :167   A little like me  : 96   A little like me  :112  
-#>  Somewhat like me  :240   Somewhat like me  :215   Somewhat like me  :254  
-#>  Like me           :276   Like me           :448   Like me           :403  
-#>  Very much like me :184   Very much like me :328   Very much like me :283  
-#>  NA's              :139   NA's              :128   NA's              :125  
-#>                 valspl                  valfree                  valcare   
-#>  Not like me at all: 77   Not like me at all:  8   Not like me at all:  6  
-#>  Not like me       :301   Not like me       : 43   Not like me       :  9  
-#>  A little like me  :233   A little like me  : 85   A little like me  : 62  
-#>  Somewhat like me  :244   Somewhat like me  :173   Somewhat like me  :198  
-#>  Like me           :182   Like me           :370   Like me           :428  
-#>  Very much like me :104   Very much like me :460   Very much like me :433  
-#>  NA's              :114   NA's              :116   NA's              :119  
-#>                valachv                  valdfnd                  valrisk   
-#>  Not like me at all: 52   Not like me at all: 28   Not like me at all: 89  
-#>  Not like me       :226   Not like me       : 97   Not like me       :278  
-#>  A little like me  :197   A little like me  :124   A little like me  :188  
-#>  Somewhat like me  :260   Somewhat like me  :203   Somewhat like me  :274  
-#>  Like me           :225   Like me           :378   Like me           :178  
-#>  Very much like me :164   Very much like me :305   Very much like me :114  
-#>  NA's              :131   NA's              :120   NA's              :134  
-#>                valprpr                  valrspt                  valdvot   
-#>  Not like me at all: 35   Not like me at all: 54   Not like me at all:  4  
-#>  Not like me       :154   Not like me       :275   Not like me       : 15  
-#>  A little like me  :165   A little like me  :198   A little like me  : 60  
-#>  Somewhat like me  :249   Somewhat like me  :322   Somewhat like me  :183  
-#>  Like me           :301   Like me           :197   Like me           :412  
-#>  Very much like me :215   Very much like me : 78   Very much like me :463  
-#>  NA's              :136   NA's              :131   NA's              :118  
-#>                 valeco                  valtrdn                   valfun   
-#>  Not like me at all: 12   Not like me at all: 49   Not like me at all: 20  
-#>  Not like me       : 45   Not like me       :119   Not like me       :126  
-#>  A little like me  :134   A little like me  :162   A little like me  :243  
-#>  Somewhat like me  :245   Somewhat like me  :245   Somewhat like me  :274  
-#>  Like me           :383   Like me           :320   Like me           :285  
-#>  Very much like me :311   Very much like me :244   Very much like me :178  
-#>  NA's              :125   NA's              :116   NA's              :129
+#>  Not like me at all: 24   Not like me at all:186   Not like me at all: 13  
+#>  Not like me       : 53   Not like me       :450   Not like me       : 21  
+#>  A little like me  :119   A little like me  :222   A little like me  : 49  
+#>  Somewhat like me  :314   Somewhat like me  :153   Somewhat like me  :141  
+#>  Like me           :293   Like me           : 75   Like me           :342  
+#>  Very much like me :324   Very much like me : 55   Very much like me :565  
+#>  NA's              :128   NA's              :114   NA's              :124  
+#>                valable   
+#>  Not like me at all: 50  
+#>  Not like me       :191  
+#>  A little like me  :181  
+#>  Somewhat like me  :277  
+#>  Like me           :245  
+#>  Very much like me :181  
+#>  NA's              :130
 ```
 
 Let’s rerun the estimation: the function works, though coefficients may
@@ -518,14 +485,14 @@ if (!require(microbenchmark)) {
 bm <- microbenchmark(
   standard = polychoric(gss_num),
   cor_polychoric = cor_polychoric(gss12_values),
-  times = 32L,
-  control = list(warmup = 6)
+  times = 13L,
+  control = list(warmup = 2)
 )
 bm
 #> Unit: milliseconds
-#>            expr      min        lq      mean    median       uq       max neval
-#>        standard 2401.933 2437.8827 2461.1264 2456.8466 2476.587 2596.6234    32
-#>  cor_polychoric  183.503  184.6935  186.6415  186.2362  187.512  195.4018    32
+#>            expr       min       lq      mean    median       uq       max neval
+#>        standard 2447.3334 2461.567 2494.1204 2485.0258 2525.670 2551.1981    13
+#>  cor_polychoric  182.1915  182.961  185.6261  186.4191  186.981  189.1754    13
 #>  cld
 #>   a 
 #>    b

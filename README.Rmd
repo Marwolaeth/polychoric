@@ -19,17 +19,12 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/Marwolaeth/polychoric/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Marwolaeth/polychoric/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-Fast Polychoric Correlation for Vectors and Data Frames
+Instant Polychoric and Polyserial Correlation
 
 ## About
-Polychoric is a package that provides a wrapper for C++ routines used to calculate polychoric correlation coefficients, which are often used in social science or marketing research. The single `cor_polychoric()` function can take in ordinal factor vectors, a contingency table, or a data frame and returns corresponding polychoric correlation estimates in the form of a single numeric value or a correlation matrix.
+Polychoric is a package that provides a wrapper for C++ routines used to calculate polychoric and polyserial correlation coefficients, which are often used in social science or marketing research. The `cor_polychoric()` function can take in ordinal factor (possibly integer) vectors, a contingency table or a data frame. It returns corresponding polychoric correlation estimates in a form of single numeric value or correlation matrix. 
 
-<details>
-  <summary>Spoiler</summary>
-  
-  Pathetic amateurish craftsmanship
-  
- </details>
+The `cor_polyserial()` takes exactly one continuous and one ordinal vector and returns a polyserial coefficient estimate. Both functions optionally return the p-values associated with the coefficients and estimated discretization thresholds for ordinal variables.
 
 ## Installation
 
@@ -43,9 +38,11 @@ You can install the development version of polychoric from [GitHub](https://gith
 ## The Purpose
 Polychoric correlation coefficients are a type of correlation coefficient used to measure the relationship between two ordinal variables. They are computed by estimating the correlation between two underlying continuous variables that are assumed to give rise to the observed ordinal data. The `cor_polychoric()` function estimates latent Pearson correlation coefficients under the assumption that the latent traits of interest are standard normal random variables.
 
-The computation of polychoric correlation coefficients involves estimating the thresholds (here called `gamma` and `tau`, like in (*Drasgow 1986*), or just `tau` as in `psych` package (*Revelle 2023*)) that separate the ordinal categories for each variable. These thresholds are used to transform the ordinal data into a set of continuous variables, which can then be used to estimate the correlation coefficient using standard methods. The `cor_polychoric()` function currently estimates the thresholds using a two-step maximum likelihood estimation, where first the thresholds are deduced from univariate distributions of ordinal variables and then the `L-BFGS-B` optimization algorithm (implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/), *Yixuan 2023*) is used to find the value of the correlation coefficient $\rho$ that maximizes the likelihood of the observed contingency table. The `toms462` (*Donnelly 1973*, *Owen 1956*) [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html) is used to approximate the bivariate normal distribution (quadrant probabilities) of threshold values.
+Polyserial correlation is used to measure the relationship between a continuous variable and an ordinal variable. They are computed by estimating the correlation between the observed continuous variable and a latent continuous variable that is derived from the observed ordinal variable.
 
-Polychoric correlation coefficients are useful for analyzing data that involve ordinal variables, such as Likert scales or survey responses. They provide a measure of the strength and direction of the relationship between two ordinal variables, which can be useful for understanding patterns in the data.
+The computation of both polychoric and polyserial correlation coefficients involves estimating the thresholds (here called `gamma` and `tau`, like in (*Drasgow 1986*), or just `tau` as in `psych` package (*Revelle 2023*)) that separate the ordinal categories for each variable. These thresholds are used to transform the ordinal data into a set of continuous variables, which can then be used to estimate the correlation coefficient using standard methods. The `cor_polychoric()` and `cor_polyserial()` functions currently estimate the coefficients using a two-step maximum likelihood estimation, where first the thresholds are deduced from univariate distributions of ordinal variable(s) and then the `L-BFGS-B` optimization algorithm (implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/), *Yixuan 2023*) is used to find the value of the correlation coefficient $\rho$ that maximizes the likelihood of the observed data. The `toms462` (*Donnelly 1973*, *Owen 1956*) [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html) is used to approximate the bivariate normal distribution (quadrant probabilities) of threshold values in `cor_polychoric()`.
+
+Polychoric and polyserial correlation coefficients are useful for analyzing data that involve ordinal variables, such as Likert scales or survey responses. They provide a measure of the strength and direction of the relationship between two ordinal variables, which can be useful for understanding patterns in the data.
 
 ## Example
 
@@ -87,7 +84,7 @@ cor_polychoric(gss12_values$valorig, gss12_values$valeql, coef.only = FALSE)
 (G <- table(gss12_values$valorig, gss12_values$valeql))
 cor_polychoric(G)
 # side with psych:polychoric()
-psych::polychoric(G, correct = .1)$rho
+psych::polychoric(G)$rho
 ```
 
 Notice that threshold values are exactly the same for both functions:
@@ -95,7 +92,7 @@ Notice that threshold values are exactly the same for both functions:
 ```{r example-contingency-full}
 cor_polychoric(G, coef.only = FALSE)
 # side with psych:polychoric()
-psych::polychoric(G, correct = .1)
+psych::polychoric(G, correct = 1e-08)
 ```
 
 ### For a data frame
@@ -153,7 +150,9 @@ cor_polychoric(gss12_values$valspl, x)
 Alternatively, one can correlate a continuous and an ordinal variable explicitly using polyserial correlation. The `polychoric` package contains `cor_polyserial()` function that estimates polyserial correlation coefficients between a continuous and an ordinal variable.
 
 ```{r example-polyserial}
-x <- rnorm(nrow(gss12_values))
+# Let them be actually correlated
+x <- as.integer(gss12_values$valspl) * 20.2 + rnorm(nrow(gss12_values), sd = 13)
+cor(x, as.integer(gss12_values$valspl))
 cor_polyserial(x, gss12_values$valspl)
 ```
 
@@ -177,7 +176,7 @@ mask <- matrix(
   nrow = nrow(gss_miss)
 )
 gss_miss[!mask] <- NA
-summary(gss_miss)
+summary(gss_miss[,1:4]) # Now NAs are present
 ```
 
 Let's rerun the estimation: the function works, though coefficients may be different.
@@ -205,8 +204,8 @@ if (!require(microbenchmark)) {
 bm <- microbenchmark(
   standard = polychoric(gss_num),
   cor_polychoric = cor_polychoric(gss12_values),
-  times = 32L,
-  control = list(warmup = 6)
+  times = 13L,
+  control = list(warmup = 2)
 )
 bm
 ```
