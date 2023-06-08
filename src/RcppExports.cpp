@@ -123,6 +123,8 @@ BEGIN_RCPP
 END_RCPP
 }
 
+RcppExport SEXP run_testthat_tests(void *);
+
 static const R_CallMethodDef CallEntries[] = {
     {"_polychoric_shadow_matrix", (DL_FUNC) &_polychoric_shadow_matrix, 1},
     {"_polychoric_poly_tab", (DL_FUNC) &_polychoric_poly_tab, 2},
@@ -133,6 +135,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_polychoric_poly_df_full", (DL_FUNC) &_polychoric_poly_df_full, 2},
     {"_polychoric_cor_polyserial", (DL_FUNC) &_polychoric_cor_polyserial, 3},
     {"_polychoric_cor_polyserial_full", (DL_FUNC) &_polychoric_cor_polyserial_full, 3},
+    {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };
 
