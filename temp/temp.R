@@ -66,3 +66,13 @@ abline(v = rhos[which.min(abs(dl))], col = 'red3')
 rhos[which.min(ll)]
 rhos[which.min(abs(dl))]
 dl[which.min(abs(dl))]
+
+## RANK ----
+mat <- df |> sapply(as.integer)
+bm_rank <- microbenchmark(
+  base = apply(df, 2, rank),
+  eign = apply(mat, 2, rank_),
+  times = 1e3,
+  control = list(warmup = 400L)
+)
+bm_rank

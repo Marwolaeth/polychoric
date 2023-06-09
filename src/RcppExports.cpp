@@ -11,17 +11,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// shadow_matrix
-Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow_matrix(const Eigen::MatrixXd& M);
-RcppExport SEXP _polychoric_shadow_matrix(SEXP MSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type M(MSEXP);
-    rcpp_result_gen = Rcpp::wrap(shadow_matrix(M));
-    return rcpp_result_gen;
-END_RCPP
-}
 // poly_tab
 double poly_tab(Eigen::MatrixXd G, const double& correct);
 RcppExport SEXP _polychoric_poly_tab(SEXP GSEXP, SEXP correctSEXP) {
@@ -126,7 +115,6 @@ END_RCPP
 RcppExport SEXP run_testthat_tests(void *);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_polychoric_shadow_matrix", (DL_FUNC) &_polychoric_shadow_matrix, 1},
     {"_polychoric_poly_tab", (DL_FUNC) &_polychoric_poly_tab, 2},
     {"_polychoric_poly_xy", (DL_FUNC) &_polychoric_poly_xy, 3},
     {"_polychoric_poly_df", (DL_FUNC) &_polychoric_poly_df, 2},

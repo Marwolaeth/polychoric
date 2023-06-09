@@ -129,14 +129,18 @@ MatrixXl shadow_matrix(
 }
 
 // Function to count number of unique values in a vector
-int n_unique(
-    const Eigen::VectorXd& X,
-    VectorXl keep = {}
-) {
-  // Filter out NA values
-  if (keep.size() == 0) {
-    keep = !(X.array().isNaN());
+int n_unique(const Eigen::VectorXd& x) {
+  int n = x.size();
+  std::unordered_set<double> seen;
+  for (int i = 0; i < n; i++) {
+    seen.insert(x(i));
   }
+  return seen.size();
+}
+
+// Overload n_unique with pre-defined filter mask
+int n_unique(const Eigen::VectorXd& X, const VectorXl& keep) {
+  // Filter out NA values
   Eigen::VectorXd x = filter(X, keep);
   
   int n = x.size();
@@ -148,14 +152,33 @@ int n_unique(
 }
 
 // Function to calculate rank of vector elements with ties resolved by mean rank
-Eigen::VectorXd rank_(
-    const Eigen::VectorXd& v,
-    VectorXl keep = {}
-) {
-  // Filter out NA values
-  if (keep.size() == 0) {
-    keep = !(v.array().isNaN());
+Eigen::VectorXd rank_(const Eigen::VectorXd& x) {
+  int n = x.size();
+  
+  std::vector<std::size_t> w(n);
+  std::iota(begin(w), end(w), 0);
+  std::sort(begin(w), end(w), 
+            [&x](std::size_t i, std::size_t j) { return x(i) < x(j); });
+  
+  Eigen::VectorXd r(w.size());
+  for (std::size_t n, i = 0; i < w.size(); i += n)
+  {
+    n = 1;
+    while (i + n < w.size() && x(w[i]) == x(w[i+n])) ++n;
+    for (std::size_t k = 0; k < n; ++k)
+    {
+      r(w[i+k]) = i + (n + 1) / 2.0; // average rank of n tied values
+      // r(w[i+k]) = i + 1;          // min 
+      // r(w[i+k]) = i + n;          // max
+      // r(w[i+k]) = i + k + 1;      // random order
+    }
   }
+  return r;
+}
+
+// Overload rank_ with pre-defined filter mask
+Eigen::VectorXd rank_(const Eigen::VectorXd& v, const VectorXl& keep) {
+  // Filter out NA values
   Eigen::VectorXd x = filter(v, keep);
   int n = x.size();
   
@@ -172,9 +195,6 @@ Eigen::VectorXd rank_(
     for (std::size_t k = 0; k < n; ++k)
     {
       r(w[i+k]) = i + (n + 1) / 2.0; // average rank of n tied values
-      // r(w[i+k]) = i + 1;          // min 
-      // r(w[i+k]) = i + n;          // max
-      // r(w[i+k]) = i + k + 1;      // random order
     }
   }
   return r;
@@ -402,11 +422,37 @@ double cor_pearson(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
   return Cov(x, y) / (SD(x) * SD(y));
 }
 
-double cor_spearman(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
+// NaN-aware version to be used outside the main pipeline
+double cor_pearson_safe(const Eigen::VectorXd& X, const Eigen::VectorXd& Y) {
   // Filter for pairwise complete observations
-  // VectorXl pco = pairwise_complete(X, Y);
-  // Eigen::VectorXd x = filter(X, pco);
-  // Eigen::VectorXd y = filter(Y, pco);
+  VectorXl pco = pairwise_complete(X, Y);
+  Eigen::VectorXd x = filter(X, pco);
+  Eigen::VectorXd y = filter(Y, pco);
+  
+  return Cov(x, y) / (SD(x) * SD(y));
+}
+
+double cor_spearman(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
+  long long int n = x.size();
+  Eigen::VectorXd d(n);
+  double rho;
+  // check for equal length
+  // if (y.size() != n) {
+  //   Rcpp::stop("Vectors are of different dimensionality");
+  // }
+  d = rank_(x).array() - rank_(y).array();
+  rho = 1.0 - (6.0 * (d.dot(d))) / (n*(n*n - 1));
+  rho = (rho < -1.0) ? -1.0 : rho;
+  rho = (rho >  1.0) ?  1.0 : rho;
+  return rho;
+}
+
+// NaN-aware version to be used outside the main pipeline
+double cor_spearman_safe(const Eigen::VectorXd& X, const Eigen::VectorXd& Y) {
+  // Filter for pairwise complete observations
+  VectorXl pco = pairwise_complete(X, Y);
+  Eigen::VectorXd x = filter(X, pco);
+  Eigen::VectorXd y = filter(Y, pco);
   
   long long int n = x.size();
   Eigen::VectorXd d(n);
@@ -551,14 +597,37 @@ public:
 
 // Function to estimate thresholds from an Eigen VectorXd object
 Eigen::VectorXd estimate_thresholds(
+    const Eigen::VectorXd& x,
+    const double& correct = 1e-08
+) {
+  int N = x.size();
+  
+  int m = x.maxCoeff();
+  Eigen::VectorXd counts = Eigen::VectorXd::Zero(m);
+  for (int i = 0; i < N; i++) {
+    counts(x(i)-1) += 1.0;
+  }
+  for (int i = 0; i < m; i++) {
+    double cnt = counts(i);
+    counts(i) = (cnt == 0.0) ? correct : cnt;
+  }
+  for (int i = 1; i < m; i++) {
+    counts(i) += counts(i-1);
+  }
+  Eigen::VectorXd p(m-1);
+  p = counts.head(m-1).array() / N;
+  Eigen::VectorXd q(m-1);
+  q = Phi_inv_(p);
+  return q;
+}
+
+// Overload estimate_thresholds with pre-defined filter mask
+Eigen::VectorXd estimate_thresholds(
     const Eigen::VectorXd& X,
-    VectorXl keep = {},
+    const VectorXl& keep,
     const double& correct = 1e-08
 ) {
   // Filter out NA values
-  if (keep.size() == 0) {
-    keep = !(X.array().isNaN());
-  }
   Eigen::VectorXd x = filter(X, keep);
   
   int N = x.size();
@@ -713,9 +782,9 @@ Eigen::MatrixXd contingency_table(
     const Eigen::VectorXd& y
 ) {
   int n = x.size();
-  int k1 = x.maxCoeff();
-  int k2 = y.maxCoeff();
-  Eigen::MatrixXd table = Eigen::MatrixXd::Zero(k1, k2);
+  int r = x.maxCoeff();
+  int s = y.maxCoeff();
+  Eigen::MatrixXd table = Eigen::MatrixXd::Zero(r, s);
   for (int i = 0; i < n; i++) {
     table(x(i)-1, y(i)-1) += 1;
   }
@@ -1098,9 +1167,8 @@ public:
     n = d.size();
     s = d.maxCoeff();
     z = (x.array() - x.mean()) / SD(x);
-    // Assert missing values were already filtered out
-    VectorXl mask = VectorXl::Ones(n).cast<bool>();
-    tau = estimate_thresholds(d, mask, correct);
+
+    tau = estimate_thresholds(d, correct);
     mu = x.mean();
     sigma = SD(x);
   }
