@@ -158,7 +158,7 @@ gc()
 bm <- microbenchmark(
   polychoric = polychoric(gss_num, correct = 1e8),
   cor_polychoric = cor_polychoric(gss12_values, coef.only = FALSE),
-  times = 6L,
-  control = list(warmup = 2)
+  times = 13L,
+  control = list(warmup = 2L)
 )
 bm
