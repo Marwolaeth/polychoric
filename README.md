@@ -76,6 +76,21 @@ survey responses. They provide a measure of the strength and direction
 of the relationship between two ordinal variables, which can be useful
 for understanding patterns in the data.
 
+## Disclaimer
+
+Please note that the `polychoric` package was developed as a personal
+project and is not intended for professional or commercial use. While
+every effort has been made to ensure the accuracy and reliability of the
+package, it is provided ‘as is’ without any warranty or guarantee of
+suitability for any particular purpose. The package is intended
+primarily as a means of exploring the direct implementation of (not so)
+complex mathematical concepts, such as likelihood functions and
+derivatives, and as such may not be suitable for all use cases. However,
+it is hoped that others may find the package useful and informative. If
+you do choose to use the `polychoric` package, please do so with an
+understanding of its intended use as a personal project and with full
+awareness of any limitations or potential issues.
+
 ## Example
 
 ### Data preview
@@ -383,7 +398,7 @@ x <- rnorm(nrow(gss12_values))
 cor_polychoric(gss12_values$valspl, x)
 #> Warning in .poly_xy(x, d, correct = correct): Too many levels or continuous
 #> input: returning Spearman's rho
-#> [1] 0.0518034
+#> [1] -0.00531952
 ```
 
 ### Polyserial correlation
@@ -397,9 +412,9 @@ correlation coefficients between a continuous and an ordinal variable.
 # Let them be actually correlated
 x <- as.integer(gss12_values$valspl) * 20.2 + rnorm(nrow(gss12_values), sd = 13)
 cor(x, as.integer(gss12_values$valspl))
-#> [1] 0.9065667
+#> [1] 0.9132652
 cor_polyserial(x, gss12_values$valspl)
-#> [1] 0.9248101
+#> [1] 0.928864
 ```
 
 Due to its strong bivariate normality assumptions, `cor_polyserial()`
@@ -433,21 +448,21 @@ mask <- matrix(
 gss_miss[!mask] <- NA
 summary(gss_miss[,1:4]) # Now NAs are present
 #>                valorig                  valrich                   valeql   
-#>  Not like me at all: 24   Not like me at all:186   Not like me at all: 13  
-#>  Not like me       : 53   Not like me       :450   Not like me       : 21  
-#>  A little like me  :119   A little like me  :222   A little like me  : 49  
-#>  Somewhat like me  :314   Somewhat like me  :153   Somewhat like me  :141  
-#>  Like me           :293   Like me           : 75   Like me           :342  
-#>  Very much like me :324   Very much like me : 55   Very much like me :565  
-#>  NA's              :128   NA's              :114   NA's              :124  
+#>  Not like me at all: 21   Not like me at all:193   Not like me at all: 14  
+#>  Not like me       : 55   Not like me       :458   Not like me       : 17  
+#>  A little like me  :116   A little like me  :214   A little like me  : 43  
+#>  Somewhat like me  :318   Somewhat like me  :155   Somewhat like me  :143  
+#>  Like me           :294   Like me           : 67   Like me           :343  
+#>  Very much like me :320   Very much like me : 59   Very much like me :556  
+#>  NA's              :131   NA's              :109   NA's              :139  
 #>                valable   
-#>  Not like me at all: 50  
-#>  Not like me       :191  
-#>  A little like me  :181  
-#>  Somewhat like me  :277  
-#>  Like me           :245  
-#>  Very much like me :181  
-#>  NA's              :130
+#>  Not like me at all: 48  
+#>  Not like me       :185  
+#>  A little like me  :194  
+#>  Somewhat like me  :285  
+#>  Like me           :246  
+#>  Very much like me :176  
+#>  NA's              :121
 ```
 
 Let’s rerun the estimation: the function works, though coefficients may
@@ -490,12 +505,12 @@ bm <- microbenchmark(
 )
 bm
 #> Unit: milliseconds
-#>            expr       min       lq      mean    median       uq       max neval
-#>        standard 2447.3334 2461.567 2494.1204 2485.0258 2525.670 2551.1981    13
-#>  cor_polychoric  182.1915  182.961  185.6261  186.4191  186.981  189.1754    13
-#>  cld
-#>   a 
-#>    b
+#>            expr       min        lq      mean    median       uq       max
+#>        standard 2414.9642 2447.3109 2483.9348 2474.7553 2499.473 2611.6328
+#>  cor_polychoric  177.1701  179.2412  181.8147  182.3574  183.254  186.2031
+#>  neval cld
+#>     13  a 
+#>     13   b
 ```
 
 Another minor advantage of the `polychoric` package is that its

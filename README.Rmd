@@ -4,12 +4,15 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
+library(knitr)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  cache = TRUE,
+  cache.extra = rand_seed
 )
 ```
 
@@ -43,6 +46,9 @@ Polyserial correlation is used to measure the relationship between a continuous 
 The computation of both polychoric and polyserial correlation coefficients involves estimating the thresholds (here called `gamma` and `tau`, like in (*Drasgow 1986*), or just `tau` as in `psych` package (*Revelle 2023*)) that separate the ordinal categories for each variable. These thresholds are used to transform the ordinal data into a set of continuous variables, which can then be used to estimate the correlation coefficient using standard methods. The `cor_polychoric()` and `cor_polyserial()` functions currently estimate the coefficients using a two-step maximum likelihood estimation, where first the thresholds are deduced from univariate distributions of ordinal variable(s) and then the `L-BFGS-B` optimization algorithm (implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/), *Yixuan 2023*) is used to find the value of the correlation coefficient $\rho$ that maximizes the likelihood of the observed data. The `toms462` (*Donnelly 1973*, *Owen 1956*) [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html) is used to approximate the bivariate normal distribution (quadrant probabilities) of threshold values in `cor_polychoric()`.
 
 Polychoric and polyserial correlation coefficients are useful for analyzing data that involve ordinal variables, such as Likert scales or survey responses. They provide a measure of the strength and direction of the relationship between two ordinal variables, which can be useful for understanding patterns in the data.
+
+## Disclaimer
+Please note that the `polychoric` package was developed as a personal project and is not intended for professional or commercial use. While every effort has been made to ensure the accuracy and reliability of the package, it is provided 'as is' without any warranty or guarantee of suitability for any particular purpose. The package is intended primarily as a means of exploring the direct implementation of (not so) complex mathematical concepts, such as likelihood functions and derivatives, and as such may not be suitable for all use cases. However, it is hoped that others may find the package useful and informative. If you do choose to use the `polychoric` package, please do so with an understanding of its intended use as a personal project and with full awareness of any limitations or potential issues.
 
 ## Example
 
@@ -140,7 +146,7 @@ The `cor_polychoric()` function is currently limited in its flexibility as it on
 
 It's worth noting that variables with a high number of distinct values may cause estimation issues, so the `cor_polychoric()` function returns Spearman's $\rho$ instead (with a warning).
 
-```{r example-mixed}
+```{r example-mixed, set.seed(111)}
 x <- rnorm(nrow(gss12_values))
 cor_polychoric(gss12_values$valspl, x)
 ```
@@ -149,7 +155,7 @@ cor_polychoric(gss12_values$valspl, x)
 
 Alternatively, one can correlate a continuous and an ordinal variable explicitly using polyserial correlation. The `polychoric` package contains `cor_polyserial()` function that estimates polyserial correlation coefficients between a continuous and an ordinal variable.
 
-```{r example-polyserial}
+```{r example-polyserial, set.seed(111)}
 # Let them be actually correlated
 x <- as.integer(gss12_values$valspl) * 20.2 + rnorm(nrow(gss12_values), sd = 13)
 cor(x, as.integer(gss12_values$valspl))
@@ -164,7 +170,7 @@ The `cor_polychoric()` function always uses pairwise complete observations. Ther
 
 The General Social Survey Schwartz Values Module dataset is cleared of missing values (non-response or non-applicable). Here we introduce some NAs into random places across the dataset. The summary will show the dataset now actually contains missings.
 
-```{r example-missing-01}
+```{r example-missing-01, set.seed(111)}
 gss_miss <- gss12_values
 mask <- matrix(
   sample(
