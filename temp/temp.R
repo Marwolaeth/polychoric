@@ -66,12 +66,3 @@ abline(v = rhos[which.min(abs(dl))], col = 'red3')
 rhos[which.min(ll)]
 rhos[which.min(abs(dl))]
 dl[which.min(abs(dl))]
-
-## NaN propagation ----
-# create df_miss
-list_to_matrix(df_miss)
-shadow_matrix(list_to_matrix(df_miss))
-
-x <- as.integer(gss12_values$valspl) * 20.2 + rnorm(nrow(gss12_values), sd = 13)
-cor(x, as.integer(gss12_values$valspl))
-cor_polyserial(x, gss12_values$valspl)

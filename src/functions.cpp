@@ -12,6 +12,10 @@
 #include "toms462.cpp"
 #include "LBFGSB.h"
 
+// Logical vectors and matrices — very useful
+typedef Eigen::Array<bool, Eigen::Dynamic, 1> VectorXl;
+typedef Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXl;
+
 /*
  TOMS462 is a C++ library which evaluates the upper right tail of the bivariate
  normal distribution; that is, the probability that normal variables
@@ -61,24 +65,24 @@
 const double pi = 3.1415926535; // set pi
 
 // ## UTILS
-Eigen::Array<bool, Eigen::Dynamic, 1> is_na(const Eigen::VectorXd& x) {
+VectorXl is_na(const Eigen::VectorXd& x) {
   return x.array().isNaN();
 }
 
 // Find pairwise complete observations for two vectors
-Eigen::Array<bool, Eigen::Dynamic, 1> pairwise_complete(
+VectorXl pairwise_complete(
     const Eigen::VectorXd& x,
     const Eigen::VectorXd& y
 ) {
-  Eigen::Array<bool, Eigen::Dynamic, 1> miss_x = x.array().isNaN();
-  Eigen::Array<bool, Eigen::Dynamic, 1> miss_y = y.array().isNaN();
+  VectorXl miss_x = x.array().isNaN();
+  VectorXl miss_y = y.array().isNaN();
   return !(miss_x || miss_y);
 }
 
 // Filter vector based on the boolean mask
 Eigen::VectorXd filter(
     const Eigen::VectorXd& x,
-    const Eigen::Array<bool, Eigen::Dynamic, 1>& mask
+    const VectorXl& mask
 ) {
   // Create empty vector to store selected values
   Eigen::VectorXd xc = {};
@@ -116,11 +120,10 @@ Eigen::MatrixXd list_to_matrix(Rcpp::List lst) {
   return mat;
 }
 
-// [[Rcpp::export]]
-Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow_matrix(
+MatrixXl shadow_matrix(
     const Eigen::MatrixXd& M
 ) {
-  Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow = !(M.array().isNaN());
+  MatrixXl shadow = !(M.array().isNaN());
   
   return shadow.matrix();
 }
@@ -128,7 +131,7 @@ Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow_matrix(
 // Function to count number of unique values in a vector
 int n_unique(
     const Eigen::VectorXd& X,
-    Eigen::Array<bool, Eigen::Dynamic, 1> keep = {}
+    VectorXl keep = {}
 ) {
   // Filter out NA values
   if (keep.size() == 0) {
@@ -147,7 +150,7 @@ int n_unique(
 // Function to calculate rank of vector elements with ties resolved by mean rank
 Eigen::VectorXd rank_(
     const Eigen::VectorXd& v,
-    Eigen::Array<bool, Eigen::Dynamic, 1> keep = {}
+    VectorXl keep = {}
 ) {
   // Filter out NA values
   if (keep.size() == 0) {
@@ -401,7 +404,7 @@ double cor_pearson(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
 
 double cor_spearman(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
   // Filter for pairwise complete observations
-  // Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, Y);
+  // VectorXl pco = pairwise_complete(X, Y);
   // Eigen::VectorXd x = filter(X, pco);
   // Eigen::VectorXd y = filter(Y, pco);
   
@@ -549,7 +552,7 @@ public:
 // Function to estimate thresholds from an Eigen VectorXd object
 Eigen::VectorXd estimate_thresholds(
     const Eigen::VectorXd& X,
-    Eigen::Array<bool, Eigen::Dynamic, 1> keep = {},
+    VectorXl keep = {},
     const double& correct = 1e-08
 ) {
   // Filter out NA values
@@ -728,7 +731,7 @@ double poly_xy(
 ) {
   // Filter for pairwise complete observations
   // auto start = std::chrono::system_clock::now(); // TIME IT
-  Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, Y);
+  VectorXl pco = pairwise_complete(X, Y);
   Eigen::VectorXd x = filter(X, pco);
   Eigen::VectorXd y = filter(Y, pco);
   // auto end = std::chrono::system_clock::now(); // TIME IT
@@ -787,7 +790,7 @@ double poly_xy_inside(
 // Polychoric correlation given a numeric matrix
 Eigen::MatrixXd poly_mat(
     const Eigen::MatrixXd& X,  // A numeric (integer) matrix
-    Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow,
+    MatrixXl shadow,
     Rcpp::List thresholds,     // Pre-estimated thresholds
     double correct = 1e-08     // Continuity correction value
 ) {
@@ -798,7 +801,7 @@ Eigen::MatrixXd poly_mat(
   // Create item vectors and threshold templates
   Eigen::VectorXd x(N), y(N), gamma, tau;
   // Boolean vectors of whether an observation is not missing
-  Eigen::Array<bool, Eigen::Dynamic, 1> x_complete, y_complete;
+  VectorXl x_complete, y_complete;
   
   // Check for discreteness
   bool cont_x, cont_y;
@@ -846,7 +849,7 @@ Eigen::MatrixXd poly_df(Rcpp::List X, double correct = 1e-08) {
   // Convert to matrix
   Eigen::MatrixXd M = list_to_matrix(X);
   // Create matrix of non-missing values
-  Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow = shadow_matrix(M);
+  MatrixXl shadow = shadow_matrix(M);
   // Create empty lists to store thresholds
   Rcpp::List thresholds(m); // Estimate threshold values early
   // Create threshold templates
@@ -969,7 +972,7 @@ Rcpp::List poly_df_full(Rcpp::List X, double correct = 1e-08) {
   Eigen::MatrixXd M = list_to_matrix(X);
   int N = M.rows();          // number of respondents
   // Create matrix of non-missing values
-  Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow = shadow_matrix(M);
+  MatrixXl shadow = shadow_matrix(M);
   // Create empty lists to store thresholds
   Rcpp::List thresholds(m); // Estimate threshold values early
   // Create threshold templates
@@ -1096,7 +1099,7 @@ public:
     s = d.maxCoeff();
     z = (x.array() - x.mean()) / SD(x);
     // Assert missing values were already filtered out
-    Eigen::Array<bool, Eigen::Dynamic, 1> mask = Eigen::Array<bool, Eigen::Dynamic, 1>::Ones(n).cast<bool>();
+    VectorXl mask = VectorXl::Ones(n).cast<bool>();
     tau = estimate_thresholds(d, mask, correct);
     mu = x.mean();
     sigma = SD(x);
@@ -1121,7 +1124,7 @@ Polyserial optim_polyserial(
     double correct = 1e-08
 ) {
   // Filter and correct
-  Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, D);
+  VectorXl pco = pairwise_complete(X, D);
   Eigen::VectorXd x = filter(X, pco);
   Eigen::VectorXd d = correct_data(filter(D, pco));
   
