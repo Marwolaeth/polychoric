@@ -68,6 +68,6 @@ test_that("cor_polychoric(coef.only=FALSE) returns an object of class `polychori
 test_that("cor_polychoric() is fast", {
   expect_lt(
     system.time(cor_polychoric(df[,1:9], coef.only = FALSE))[['user.self']],
-    .5
+    .2
   )
 })
