@@ -709,7 +709,7 @@ double optim_polychoric(
   // Run the optimization
   double f = 0.0;
   Eigen::VectorXd x = x0;
-  int niter = solver.minimize(poly, x, f, lb, ub);
+  [[maybe_unused]] int niter = solver.minimize(poly, x, f, lb, ub);
   
   // Return the optimal value of rho
   return x(0);
@@ -1217,7 +1217,7 @@ Polyserial optim_polyserial(
   // Run the optimization
   double f = 0.0;
   Eigen::VectorXd rho = x0;
-  int niter = 0;
+  [[maybe_unused]] int niter = 0;
   
   // Optimizer may fail when Pearson's r is too good an estimate
   try {
