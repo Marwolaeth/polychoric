@@ -1,7 +1,7 @@
 Package: polychoric
 Type: Package
 Title: Instant Polychoric and Polyserial Correlation
-Version: 0.92
+Version: 0.94
 Date: 2023-06-08
 Author: Andrej Pawluczenko
 Maintainer: Andrej Pawluczenko <a.pawluczenko@gmail.com>
