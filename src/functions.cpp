@@ -732,13 +732,7 @@ double poly_tab(
   if (sds == N) {return -1.0;}
   
   // Correct for continuity
-  for (int i = 0; i < r; i++) {
-    for (int j = 0; j < s; j++) {
-      double x = G(i,j);
-      double v = (x == 0.0) ? (x + correct) : x;
-      G(i,j) = v;
-    }
-  }
+  G = G.array() + (G.array() == .0).cast<double>() * correct;
   
   std::vector<Eigen::VectorXd> thresholds = estimate_thresholds(G, r, s, N);
   Eigen::VectorXd gamma = thresholds[0];
@@ -765,13 +759,7 @@ double poly_tab_inside(
   if (sds == N) {return -1.0;}
   
   // Correct for continuity
-  for (int i = 0; i < r; i++) {
-    for (int j = 0; j < s; j++) {
-      double x = G(i,j);
-      double v = (x == 0.0) ? (x + correct) : x;
-      G(i,j) = v;
-    }
-  }
+  G = G.array() + (G.array() == .0).cast<double>() * correct;
   
   double rho = optim_polychoric(G, gamma, tau);
   return(rho);
@@ -918,7 +906,7 @@ Eigen::MatrixXd poly_df(Rcpp::List X, double correct = 1e-08) {
   
   // Convert to matrix
   Eigen::MatrixXd M = list_to_matrix(X);
-  // Create matrix of non-missing values
+  // Cast a shadow of the data: a logical matrix to indicate non-missing entries
   Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow = shadow_matrix(M);
   // Create empty lists to store thresholds
   Rcpp::List thresholds(m); // Estimate threshold values early
@@ -974,13 +962,7 @@ Rcpp::List poly_tab_full(
   int N = G.sum();
   
   // Correct for continuity
-  for (int i = 0; i < r; i++) {
-    for (int j = 0; j < s; j++) {
-      double x = G(i,j);
-      double v = (x == 0.0) ? (x + correct) : x;
-      G(i,j) = v;
-    }
-  }
+  G = G.array() + (G.array() == .0).cast<double>() * correct;
   
   std::vector<Eigen::VectorXd> thresholds = estimate_thresholds(G, r, s, N);
   Eigen::VectorXd gamma = thresholds[0];
@@ -1041,7 +1023,7 @@ Rcpp::List poly_df_full(Rcpp::List X, double correct = 1e-08) {
   // Convert to matrix
   Eigen::MatrixXd M = list_to_matrix(X);
   int N = M.rows();          // number of respondents
-  // Create matrix of non-missing values
+  // Cast a shadow of the data: a logical matrix to indicate non-missing entries
   Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow = shadow_matrix(M);
   // Create empty lists to store thresholds
   Rcpp::List thresholds(m); // Estimate threshold values early

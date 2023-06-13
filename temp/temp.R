@@ -67,12 +67,20 @@ rhos[which.min(ll)]
 rhos[which.min(abs(dl))]
 dl[which.min(abs(dl))]
 
-## RANK ----
-mat <- df |> sapply(as.integer)
-bm_rank <- microbenchmark(
-  base = apply(df, 2, rank),
-  eign = apply(mat, 2, rank_),
-  times = 1e3,
-  control = list(warmup = 400L)
+## CORRECT ----
+data("gss12_values")
+(G <- table(gss12_values$valachv, gss12_values$valable))
+correct_table_loop(G)
+correct_table_mask(G)
+identical(correct_table_loop(G), correct_table_mask(G))
+
+gc()
+bm_correct <- microbenchmark(
+  loop = correct_table_loop(G),
+  mask = correct_table_mask(G),
+  times = 1e6,
+  check = 'equal',
+  control = list(warmup = 1e3)
 )
-bm_rank
+bm_correct
+t.test(time ~ expr, data = bm_correct)

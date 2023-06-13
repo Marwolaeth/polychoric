@@ -16,28 +16,28 @@
 typedef Eigen::Array<bool, Eigen::Dynamic, 1> VectorXl;
 typedef Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXl;
 
-// Function to calculate rank of vector elements with ties resolved by mean rank
 // [[Rcpp::export]]
-Eigen::VectorXd rank_(const Eigen::VectorXd& x) {
-  int n = x.size();
+Eigen::MatrixXd correct_table_loop(Eigen::MatrixXd G, const double& correct = .1) {
+  int r = G.rows();
+  int s = G.cols();
   
-  std::vector<std::size_t> w(n);
-  std::iota(begin(w), end(w), 0);
-  std::sort(begin(w), end(w), 
-            [&x](std::size_t i, std::size_t j) { return x(i) < x(j); });
-  
-  Eigen::VectorXd r(w.size());
-  for (std::size_t n, i = 0; i < w.size(); i += n)
-  {
-    n = 1;
-    while (i + n < w.size() && x(w[i]) == x(w[i+n])) ++n;
-    for (std::size_t k = 0; k < n; ++k)
-    {
-      r(w[i+k]) = i + (n + 1) / 2.0; // average rank of n tied values
-      // r(w[i+k]) = i + 1;          // min 
-      // r(w[i+k]) = i + n;          // max
-      // r(w[i+k]) = i + k + 1;      // random order
+  // Correct for continuity
+  for (int i = 0; i < r; i++) {
+    for (int j = 0; j < s; j++) {
+      double x = G(i,j);
+      double v = (x == 0.0) ? (x + correct) : x;
+      G(i,j) = v;
     }
   }
-  return r;
+  
+  return G;
+}
+
+// [[Rcpp::export]]
+Eigen::MatrixXd correct_table_mask(Eigen::MatrixXd G, const double& correct = .1) {
+  Eigen::MatrixXd zero_entries = (G.array() == .0).cast<double>();
+  
+  G = G.array() + (G.array() == .0).cast<double>() * correct;
+  
+  return G;
 }
