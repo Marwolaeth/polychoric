@@ -14,8 +14,8 @@
 
 // Logical vectors and matrices — very useful
 // Sometimes fails on Mac OS?
-// typedef Eigen::Array<bool, Eigen::Dynamic, 1> VectorXl;
-// typedef Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXl;
+typedef Eigen::Array<bool, Eigen::Dynamic, 1> VectorXl;
+typedef Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXl;
 
 /*
  TOMS462 is a C++ library which evaluates the upper right tail of the bivariate
@@ -66,24 +66,24 @@
 const double pi = 3.1415926535; // set pi
 
 // ## UTILS
-Eigen::Array<bool, Eigen::Dynamic, 1> is_na(const Eigen::VectorXd& x) {
+VectorXl is_na(const Eigen::VectorXd& x) {
   return x.array().isNaN();
 }
 
 // Find pairwise complete observations for two vectors
-Eigen::Array<bool, Eigen::Dynamic, 1> pairwise_complete(
+VectorXl pairwise_complete(
     const Eigen::VectorXd& x,
     const Eigen::VectorXd& y
 ) {
-  Eigen::Array<bool, Eigen::Dynamic, 1> miss_x = x.array().isNaN();
-  Eigen::Array<bool, Eigen::Dynamic, 1> miss_y = y.array().isNaN();
+  VectorXl miss_x = x.array().isNaN();
+  VectorXl miss_y = y.array().isNaN();
   return !(miss_x || miss_y);
 }
 
 // Filter vector based on the boolean mask
 Eigen::VectorXd filter(
     const Eigen::VectorXd& x,
-    const Eigen::Array<bool, Eigen::Dynamic, 1>& mask
+    const VectorXl& mask
 ) {
   // Create empty vector to store selected values
   Eigen::VectorXd xc = {};
@@ -121,10 +121,10 @@ Eigen::MatrixXd list_to_matrix(Rcpp::List lst) {
   return mat;
 }
 
-Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow_matrix(
+MatrixXl shadow_matrix(
     const Eigen::MatrixXd& M
 ) {
-  Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow = !(M.array().isNaN());
+  MatrixXl shadow = !(M.array().isNaN());
   
   return shadow.matrix();
 }
@@ -140,7 +140,7 @@ int n_unique(const Eigen::VectorXd& x) {
 }
 
 // Overload n_unique with pre-defined filter mask
-int n_unique(const Eigen::VectorXd& X, const Eigen::Array<bool, Eigen::Dynamic, 1>& keep) {
+int n_unique(const Eigen::VectorXd& X, const VectorXl& keep) {
   // Filter out NA values
   Eigen::VectorXd x = filter(X, keep);
   
@@ -178,7 +178,7 @@ Eigen::VectorXd rank_(const Eigen::VectorXd& x) {
 }
 
 // Overload rank_ with pre-defined filter mask
-Eigen::VectorXd rank_(const Eigen::VectorXd& v, const Eigen::Array<bool, Eigen::Dynamic, 1>& keep) {
+Eigen::VectorXd rank_(const Eigen::VectorXd& v, const VectorXl& keep) {
   // Filter out NA values
   Eigen::VectorXd x = filter(v, keep);
   int n = x.size();
@@ -426,7 +426,7 @@ double cor_pearson(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
 // NaN-aware version to be used outside the main pipeline
 double cor_pearson_safe(const Eigen::VectorXd& X, const Eigen::VectorXd& Y) {
   // Filter for pairwise complete observations
-  Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, Y);
+  VectorXl pco = pairwise_complete(X, Y);
   Eigen::VectorXd x = filter(X, pco);
   Eigen::VectorXd y = filter(Y, pco);
   
@@ -451,7 +451,7 @@ double cor_spearman(const Eigen::VectorXd& x, const Eigen::VectorXd& y) {
 // NaN-aware version to be used outside the main pipeline
 double cor_spearman_safe(const Eigen::VectorXd& X, const Eigen::VectorXd& Y) {
   // Filter for pairwise complete observations
-  Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, Y);
+  VectorXl pco = pairwise_complete(X, Y);
   Eigen::VectorXd x = filter(X, pco);
   Eigen::VectorXd y = filter(Y, pco);
   
@@ -625,7 +625,7 @@ Eigen::VectorXd estimate_thresholds(
 // Overload estimate_thresholds with pre-defined filter mask
 Eigen::VectorXd estimate_thresholds(
     const Eigen::VectorXd& X,
-    const Eigen::Array<bool, Eigen::Dynamic, 1>& keep,
+    const VectorXl& keep,
     const double& correct = 1e-08
 ) {
   // Filter out NA values
@@ -789,7 +789,7 @@ double poly_xy(
 ) {
   // Filter for pairwise complete observations
   // auto start = std::chrono::system_clock::now(); // TIME IT
-  Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, Y);
+  VectorXl pco = pairwise_complete(X, Y);
   Eigen::VectorXd x = filter(X, pco);
   Eigen::VectorXd y = filter(Y, pco);
   // auto end = std::chrono::system_clock::now(); // TIME IT
@@ -848,7 +848,7 @@ double poly_xy_inside(
 // Polychoric correlation given a numeric matrix
 Eigen::MatrixXd poly_mat(
     const Eigen::MatrixXd& X,  // A numeric (integer) matrix
-    Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow,
+    MatrixXl shadow,
     Rcpp::List thresholds,     // Pre-estimated thresholds
     double correct = 1e-08     // Continuity correction value
 ) {
@@ -859,7 +859,7 @@ Eigen::MatrixXd poly_mat(
   // Create item vectors and threshold templates
   Eigen::VectorXd x(N), y(N), gamma, tau;
   // Boolean vectors of whether an observation is not missing
-  Eigen::Array<bool, Eigen::Dynamic, 1> x_complete, y_complete;
+  VectorXl x_complete, y_complete;
   
   // Check for discreteness
   bool cont_x, cont_y;
@@ -907,7 +907,7 @@ Eigen::MatrixXd poly_df(Rcpp::List X, double correct = 1e-08) {
   // Convert to matrix
   Eigen::MatrixXd M = list_to_matrix(X);
   // Cast a shadow of the data: a logical matrix to indicate non-missing entries
-  Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow = shadow_matrix(M);
+  MatrixXl shadow = shadow_matrix(M);
   // Create empty lists to store thresholds
   Rcpp::List thresholds(m); // Estimate threshold values early
   // Create threshold templates
@@ -1024,7 +1024,7 @@ Rcpp::List poly_df_full(Rcpp::List X, double correct = 1e-08) {
   Eigen::MatrixXd M = list_to_matrix(X);
   int N = M.rows();          // number of respondents
   // Cast a shadow of the data: a logical matrix to indicate non-missing entries
-  Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic> shadow = shadow_matrix(M);
+  MatrixXl shadow = shadow_matrix(M);
   // Create empty lists to store thresholds
   Rcpp::List thresholds(m); // Estimate threshold values early
   // Create threshold templates
@@ -1175,7 +1175,7 @@ Polyserial optim_polyserial(
     double correct = 1e-08
 ) {
   // Filter and correct
-  Eigen::Array<bool, Eigen::Dynamic, 1> pco = pairwise_complete(X, D);
+  VectorXl pco = pairwise_complete(X, D);
   Eigen::VectorXd x = filter(X, pco);
   Eigen::VectorXd d = correct_data(filter(D, pco));
   

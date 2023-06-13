@@ -12,10 +12,10 @@ xm <- x
 ym <- y
 cm <- C
 dm <- D
-xm[sample(1:n, 13)] <- NaN
-ym[sample(1:n, 13)] <- NaN
-cm[sample(1:n, 13)] <- NA
-dm[sample(1:n, 13)] <- NA
+xm[sample(2:n, 13)] <- NaN
+ym[sample(2:n, 13)] <- NaN
+cm[sample(2:n, 13)] <- NA
+dm[sample(2:n, 13)] <- NA
 
 ## TESTS ----
 test_that("cor_polyserial() warns when finds zero values in an ordinal variable", {
