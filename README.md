@@ -13,13 +13,13 @@ Instant Polychoric and Polyserial Correlation
 
 ## About
 
-Polychoric is a package that provides a wrapper for C++ routines used to
-calculate polychoric and polyserial correlation coefficients, which are
-often used in social science or marketing research. The
-`cor_polychoric()` function can take in ordinal factor (possibly
-integer) vectors, a contingency table or a data frame. It returns
-corresponding polychoric correlation estimates in a form of single
-numeric value or correlation matrix.
+Polychoric is a package that provides a wrapper via (Bates and
+Eddelbuettel 2013) for C++ routines used to calculate polychoric and
+polyserial correlation coefficients, which are often used in social
+science or marketing research. The `cor_polychoric()` function can take
+in ordinal factor (possibly integer) vectors, a contingency table or a
+data frame. It returns corresponding polychoric correlation estimates in
+a form of single numeric value or correlation matrix.
 
 The `cor_polyserial()` takes exactly one continuous and one ordinal
 vector and returns a polyserial coefficient estimate. Both functions
@@ -54,19 +54,20 @@ variable.
 
 The computation of both polychoric and polyserial correlation
 coefficients involves estimating the thresholds (here called `gamma` and
-`tau`, like in ((Drasgow 2004)), or just `tau` as in `psych` package
-((Revelle 2023))) that separate the ordinal categories for each
-variable. These thresholds are used to transform the ordinal data into a
-set of continuous variables, which can then be used to estimate the
-correlation coefficient using standard methods. The `cor_polychoric()`
-and `cor_polyserial()` functions currently estimate the coefficients
-using a two-step maximum likelihood estimation, where first the
-thresholds are deduced from univariate distributions of ordinal
-variable(s) and then the `L-BFGS-B` optimization algorithm (implemented
-in [LBFGS++](https://github.com/yixuan/LBFGSpp/), (Qiu 2023)) is used to
+`tau`, like in (Drasgow 1986) and (Olsson 1979), or just `tau` as in
+`psych` package (Revelle 2023)) that separate the ordinal categories for
+each variable. These thresholds are used to transform the ordinal data
+into a set of continuous variables, which can then be used to estimate
+the correlation coefficient using standard methods. The
+`cor_polychoric()` and `cor_polyserial()` functions currently estimate
+the coefficients using a two-step maximum likelihood estimation, where
+first the thresholds are deduced from univariate distributions of
+ordinal variable(s) and then the `L-BFGS-B` optimization algorithm
+(implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/), (Qiu
+2023) using `Eigen` library (Guennebaud, Jacob, et al. 2010)) is used to
 find the value of the correlation coefficient $\rho$ that maximizes the
-likelihood of the observed data. The `toms462` ((Donnelly 1973), (Owen
-1956))
+likelihood of the observed data. The `toms462` (Donnelly 1973), (Owen
+1956)
 [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html)
 is used to approximate the bivariate normal distribution (quadrant
 probabilities) of threshold values in `cor_polychoric()`.
@@ -378,7 +379,7 @@ not support biserial or polyserial estimation for mixed ordinal and
 continuous variables. The function does, however, attempt to recognise
 potentially non-discrete variables, allowing for up to 10 levels, like
 in [World Values Survey](https://www.worldvaluessurvey.org/wvs.jsp)
-(Gedeshi et al. 2021) questionnaire items. In comparison, the
+(Ingelhart et al. 2014)questionnaire items. In comparison, the
 `polychoric()` function from the `psych` package allows up to 8 levels
 by default.
 
@@ -521,11 +522,21 @@ The upcoming steps
 </summary>
 
 1.  Implement (optional) more robust distributional assumptions, e.g. a
-    skew normal distribution ((Jin and Yang-Wallentin 2016)).
+    skew normal distribution (Jin and Yang-Wallentin 2016).
 
 </details>
 
+## References
+
 <div id="refs" class="references csl-bib-body hanging-indent">
+
+<div id="ref-RcppEigen" class="csl-entry">
+
+Bates, Douglas, and Dirk Eddelbuettel. 2013. “Fast and Elegant Numerical
+Linear Algebra Using the RcppEigen Package” 52.
+<https://doi.org/10.18637/jss.v052.i05>.
+
+</div>
 
 <div id="ref-donnelly1973" class="csl-entry">
 
@@ -535,19 +546,28 @@ Distribution.” *Communications of the ACM* 16 (10): 638.
 
 </div>
 
-<div id="ref-drasgow2004" class="csl-entry">
+<div id="ref-drasgow1986" class="csl-entry">
 
-Drasgow, Fritz. 2004. “Polychoric and Polyserial Correlations,” October.
-<https://doi.org/10.1002/0471667196.ess2014>.
+Drasgow, Fritz. 1986. “Polychoric and Polyserial Correlations.” In *The
+Encyclopedia of Statistics*, edited by S. Kotz and N. Johnson, 7:68–74.
+Wiley.
 
 </div>
 
-<div id="ref-gedeshi2021" class="csl-entry">
+<div id="ref-eigenweb" class="csl-entry">
 
-Gedeshi, Ilir, Merab Pachulia, David Rotman, Sylvia Kritzinger, Georg
-Poghosyan, Georgy Fotev, Jadranka Kolenović-apo, et al. 2021. “Joint
-EVS/WVS 2017-2021 Dataset (Joint EVS/WVS).” World Values Survey
-Association. <https://doi.org/10.14281/18241.11>.
+Guennebaud, Gaël, Benoît Jacob, et al. 2010. “Eigen V3.”
+http://eigen.tuxfamily.org.
+
+</div>
+
+<div id="ref-ingelhart2014" class="csl-entry">
+
+Ingelhart, Ronald, Christian W. Haerpfer, Alejandro Moreno, Christian
+Welzel, Kseniya Kizilova, Jaime Diez-Medrano, Marta Lagos, Pippa Norris,
+Eduard Ponarin, and Bi Puranen. 2014. “World Values Survey Wave 6
+(2010-2014).” World Values Survey Association.
+<https://doi.org/10.14281/18241.8>.
 
 </div>
 
@@ -556,6 +576,14 @@ Association. <https://doi.org/10.14281/18241.11>.
 Jin, Shaobo, and Fan Yang-Wallentin. 2016. “Asymptotic Robustness Study
 of the Polychoric Correlation Estimation.” *Psychometrika* 82 (1):
 67–85. <https://doi.org/10.1007/s11336-016-9512-2>.
+
+</div>
+
+<div id="ref-olsson1979" class="csl-entry">
+
+Olsson, Ulf. 1979. “Maximum Likelihood Estimation of the Polychoric
+Correlation Coefficient.” *Psychometrika* 44 (4): 443–60.
+<https://doi.org/10.1007/bf02296207>.
 
 </div>
 

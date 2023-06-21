@@ -31,7 +31,7 @@ Instant Polychoric and Polyserial Correlation
 
 ## About
 
-Polychoric is a package that provides a wrapper for C++ routines used to calculate polychoric and polyserial correlation coefficients, which are often used in social science or marketing research. The `cor_polychoric()` function can take in ordinal factor (possibly integer) vectors, a contingency table or a data frame. It returns corresponding polychoric correlation estimates in a form of single numeric value or correlation matrix.
+Polychoric is a package that provides a wrapper via [@RcppEigen] for C++ routines used to calculate polychoric and polyserial correlation coefficients, which are often used in social science or marketing research. The `cor_polychoric()` function can take in ordinal factor (possibly integer) vectors, a contingency table or a data frame. It returns corresponding polychoric correlation estimates in a form of single numeric value or correlation matrix.
 
 The `cor_polyserial()` takes exactly one continuous and one ordinal vector and returns a polyserial coefficient estimate. Both functions optionally return the p-values associated with the coefficients and estimated discretization thresholds for ordinal variables.
 
@@ -50,7 +50,7 @@ Polychoric correlation coefficients are a type of correlation coefficient used t
 
 Polyserial correlation is used to measure the relationship between a continuous variable and an ordinal variable. They are computed by estimating the correlation between the observed continuous variable and a latent continuous variable that is derived from the observed ordinal variable.
 
-The computation of both polychoric and polyserial correlation coefficients involves estimating the thresholds (here called `gamma` and `tau`, like in ([@drasgow2004]), or just `tau` as in `psych` package ([@psych])) that separate the ordinal categories for each variable. These thresholds are used to transform the ordinal data into a set of continuous variables, which can then be used to estimate the correlation coefficient using standard methods. The `cor_polychoric()` and `cor_polyserial()` functions currently estimate the coefficients using a two-step maximum likelihood estimation, where first the thresholds are deduced from univariate distributions of ordinal variable(s) and then the `L-BFGS-B` optimization algorithm (implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/), [@LBFGSpp]) is used to find the value of the correlation coefficient $\rho$ that maximizes the likelihood of the observed data. The `toms462` ([@donnelly1973], [@owen1956]) [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html) is used to approximate the bivariate normal distribution (quadrant probabilities) of threshold values in `cor_polychoric()`.
+The computation of both polychoric and polyserial correlation coefficients involves estimating the thresholds (here called `gamma` and `tau`, like in [@drasgow1986] and [@olsson1979], or just `tau` as in `psych` package [@psych]) that separate the ordinal categories for each variable. These thresholds are used to transform the ordinal data into a set of continuous variables, which can then be used to estimate the correlation coefficient using standard methods. The `cor_polychoric()` and `cor_polyserial()` functions currently estimate the coefficients using a two-step maximum likelihood estimation, where first the thresholds are deduced from univariate distributions of ordinal variable(s) and then the `L-BFGS-B` optimization algorithm (implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/), [@LBFGSpp] using `Eigen` library [@eigenweb]) is used to find the value of the correlation coefficient $\rho$ that maximizes the likelihood of the observed data. The `toms462` [@donnelly1973], [@owen1956] [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html) is used to approximate the bivariate normal distribution (quadrant probabilities) of threshold values in `cor_polychoric()`.
 
 Polychoric and polyserial correlation coefficients are useful for analyzing data that involve ordinal variables, such as Likert scales or survey responses. They provide a measure of the strength and direction of the relationship between two ordinal variables, which can be useful for understanding patterns in the data.
 
@@ -150,7 +150,7 @@ pheatmap(
 
 ### Handling mixed variable types
 
-The `cor_polychoric()` function is currently limited in its flexibility as it only provides polychoric estimation for ordinal variables and does not support biserial or polyserial estimation for mixed ordinal and continuous variables. The function does, however, attempt to recognise potentially non-discrete variables, allowing for up to 10 levels, like in [World Values Survey](https://www.worldvaluessurvey.org/wvs.jsp) [@gedeshi2021] questionnaire items. In comparison, the `polychoric()` function from the `psych` package allows up to 8 levels by default.
+The `cor_polychoric()` function is currently limited in its flexibility as it only provides polychoric estimation for ordinal variables and does not support biserial or polyserial estimation for mixed ordinal and continuous variables. The function does, however, attempt to recognise potentially non-discrete variables, allowing for up to 10 levels, like in [World Values Survey](https://www.worldvaluessurvey.org/wvs.jsp) [@ingelhart2014]questionnaire items. In comparison, the `polychoric()` function from the `psych` package allows up to 8 levels by default.
 
 It's worth noting that variables with a high number of distinct values may cause estimation issues, so the `cor_polychoric()` function returns Spearman's $\rho$ instead (with a warning).
 
@@ -236,6 +236,11 @@ Please report any issues you came up with on the [issues](https://github.com/Mar
 
 <summary>The upcoming steps</summary>
 
-1.  Implement (optional) more robust distributional assumptions, e.g. a skew normal distribution ([@jin2016]).
+1.  Implement (optional) more robust distributional assumptions, e.g. a skew normal distribution [@jin2016].
 
 </details>
+
+## References
+
+::: {#refs}
+:::
