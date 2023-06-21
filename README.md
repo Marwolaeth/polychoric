@@ -378,8 +378,9 @@ not support biserial or polyserial estimation for mixed ordinal and
 continuous variables. The function does, however, attempt to recognise
 potentially non-discrete variables, allowing for up to 10 levels, like
 in [World Values Survey](https://www.worldvaluessurvey.org/wvs.jsp)
-questionnaire items. In comparison, the `polychoric()` function from the
-`psych` package allows up to 8 levels by default.
+(Gedeshi et al. 2021) questionnaire items. In comparison, the
+`polychoric()` function from the `psych` package allows up to 8 levels
+by default.
 
 It’s worth noting that variables with a high number of distinct values
 may cause estimation issues, so the `cor_polychoric()` function returns
@@ -419,10 +420,11 @@ However, depending on the analysis design and the ratio of missing data,
 it may be essential to check for patterns of missingness and consider
 imputation.
 
-The General Social Survey Schwartz Values Module dataset is cleared of
-missing values (non-response or non-applicable). Here we introduce some
-NAs into random places across the dataset. The summary will show the
-dataset now actually contains missings.
+The General Social Survey Schwartz Values Module dataset (Smith,
+Marsden, and Hout 2014) is cleared of missing values (non-response or
+non-applicable). Here we introduce some NAs into random places across
+the dataset. The summary will show the dataset now actually contains
+missings.
 
 ``` r
 gss_miss <- gss12_values
@@ -540,6 +542,15 @@ Drasgow, Fritz. 2004. “Polychoric and Polyserial Correlations,” October.
 
 </div>
 
+<div id="ref-gedeshi2021" class="csl-entry">
+
+Gedeshi, Ilir, Merab Pachulia, David Rotman, Sylvia Kritzinger, Georg
+Poghosyan, Georgy Fotev, Jadranka Kolenović-apo, et al. 2021. “Joint
+EVS/WVS 2017-2021 Dataset (Joint EVS/WVS).” World Values Survey
+Association. <https://doi.org/10.14281/18241.11>.
+
+</div>
+
 <div id="ref-jin2016" class="csl-entry">
 
 Jin, Shaobo, and Fan Yang-Wallentin. 2016. “Asymptotic Robustness Study
@@ -568,6 +579,15 @@ l-BFGS-b Algorithms.”
 Revelle, William. 2023. “Psych: Procedures for Psychological,
 Psychometric, and Personality Research.”
 <http://personality-project.org/r/psych/>.
+
+</div>
+
+<div id="ref-smith2014" class="csl-entry">
+
+Smith, Tom W., Peter V. Marsden, and Michael Hout. 2014. “General Social
+Survey, 2012 Merged Data, Including a Cultural Module \[United
+States\].” ICPSR - Interuniversity Consortium for Political; Social
+Research. <https://doi.org/10.3886/ICPSR35478.V4>.
 
 </div>
 

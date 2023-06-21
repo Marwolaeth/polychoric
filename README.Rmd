@@ -150,7 +150,7 @@ pheatmap(
 
 ### Handling mixed variable types
 
-The `cor_polychoric()` function is currently limited in its flexibility as it only provides polychoric estimation for ordinal variables and does not support biserial or polyserial estimation for mixed ordinal and continuous variables. The function does, however, attempt to recognise potentially non-discrete variables, allowing for up to 10 levels, like in [World Values Survey](https://www.worldvaluessurvey.org/wvs.jsp) questionnaire items. In comparison, the `polychoric()` function from the `psych` package allows up to 8 levels by default.
+The `cor_polychoric()` function is currently limited in its flexibility as it only provides polychoric estimation for ordinal variables and does not support biserial or polyserial estimation for mixed ordinal and continuous variables. The function does, however, attempt to recognise potentially non-discrete variables, allowing for up to 10 levels, like in [World Values Survey](https://www.worldvaluessurvey.org/wvs.jsp) [@gedeshi2021] questionnaire items. In comparison, the `polychoric()` function from the `psych` package allows up to 8 levels by default.
 
 It's worth noting that variables with a high number of distinct values may cause estimation issues, so the `cor_polychoric()` function returns Spearman's $\rho$ instead (with a warning).
 
@@ -176,7 +176,7 @@ Due to its strong bivariate normality assumptions, `cor_polyserial()` is curren
 
 The `cor_polychoric()` function always uses pairwise complete observations. Therefore, the user need not worry about missing data. However, depending on the analysis design and the ratio of missing data, it may be essential to check for patterns of missingness and consider imputation.
 
-The General Social Survey Schwartz Values Module dataset is cleared of missing values (non-response or non-applicable). Here we introduce some NAs into random places across the dataset. The summary will show the dataset now actually contains missings.
+The General Social Survey Schwartz Values Module dataset [@smith2014] is cleared of missing values (non-response or non-applicable). Here we introduce some NAs into random places across the dataset. The summary will show the dataset now actually contains missings.
 
 ```{r example-missing-01, set.seed(111)}
 gss_miss <- gss12_values
@@ -239,4 +239,3 @@ Please report any issues you came up with on the [issues](https://github.com/Mar
 1.  Implement (optional) more robust distributional assumptions, e.g. a skew normal distribution ([@jin2016]).
 
 </details>
-
