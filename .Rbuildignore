@@ -10,3 +10,5 @@
 ^.*.png$
 ^\.github$
 ^temp
+^reference
+^.+cache

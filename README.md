@@ -1,11 +1,12 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# polychoric <img src="man/figures/logo.png" align="right" height="139" title="Created with hexSticker package" />
+# polychoric <img src="man/figures/logo.png" title="Logo created with hexSticker package" align="right" height="139"/>
 
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/Marwolaeth/polychoric/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Marwolaeth/polychoric/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
 Instant Polychoric and Polyserial Correlation
@@ -53,8 +54,8 @@ variable.
 
 The computation of both polychoric and polyserial correlation
 coefficients involves estimating the thresholds (here called `gamma` and
-`tau`, like in (*Drasgow 1986*), or just `tau` as in `psych` package
-(*Revelle 2023*)) that separate the ordinal categories for each
+`tau`, like in ((Drasgow 2004)), or just `tau` as in `psych` package
+((Revelle 2023))) that separate the ordinal categories for each
 variable. These thresholds are used to transform the ordinal data into a
 set of continuous variables, which can then be used to estimate the
 correlation coefficient using standard methods. The `cor_polychoric()`
@@ -62,10 +63,10 @@ and `cor_polyserial()` functions currently estimate the coefficients
 using a two-step maximum likelihood estimation, where first the
 thresholds are deduced from univariate distributions of ordinal
 variable(s) and then the `L-BFGS-B` optimization algorithm (implemented
-in [LBFGS++](https://github.com/yixuan/LBFGSpp/), *Yixuan 2023*) is used
-to find the value of the correlation coefficient $\rho$ that maximizes
-the likelihood of the observed data. The `toms462` (*Donnelly 1973*,
-*Owen 1956*)
+in [LBFGS++](https://github.com/yixuan/LBFGSpp/), (Qiu 2023)) is used to
+find the value of the correlation coefficient $\rho$ that maximizes the
+likelihood of the observed data. The `toms462` ((Donnelly 1973), (Owen
+1956))
 [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html)
 is used to approximate the bivariate normal distribution (quadrant
 probabilities) of threshold values in `cor_polychoric()`.
@@ -102,14 +103,6 @@ if (!require(likert)) {
   install.packages('likert')
   library(likert)
 }
-#> Loading required package: likert
-#> Loading required package: ggplot2
-#> 
-#> Attaching package: 'ggplot2'
-#> The following objects are masked from 'package:psych':
-#> 
-#>     %+%, alpha
-#> Loading required package: xtable
 data("gss12_values", package = 'polychoric')
 head(gss12_values, 13)
 #> # A tibble: 13 × 21
@@ -334,7 +327,6 @@ if (!require(pheatmap)) {
   install.packages('pheatmap')
   library(pheatmap)
 }
-#> Loading required package: pheatmap
 rho1 <- cor_polychoric(gss12_values)
 # psych::polychoric() doesn't work with factor data directly
 gss_num <- gss12_values |> lapply(as.integer) |> as.data.frame()
@@ -396,9 +388,7 @@ Spearman’s $\rho$ instead (with a warning).
 ``` r
 x <- rnorm(nrow(gss12_values))
 cor_polychoric(gss12_values$valspl, x)
-#> Warning in .poly_xy(x, d, correct = correct): Too many levels or continuous
-#> input: returning Spearman's rho
-#> [1] -0.00531952
+#> [1] 0.03159122
 ```
 
 ### Polyserial correlation
@@ -412,9 +402,9 @@ correlation coefficients between a continuous and an ordinal variable.
 # Let them be actually correlated
 x <- as.integer(gss12_values$valspl) * 20.2 + rnorm(nrow(gss12_values), sd = 13)
 cor(x, as.integer(gss12_values$valspl))
-#> [1] 0.9132652
+#> [1] 0.9089471
 cor_polyserial(x, gss12_values$valspl)
-#> [1] 0.928864
+#> [1] 0.9227912
 ```
 
 Due to its strong bivariate normality assumptions, `cor_polyserial()`
@@ -448,21 +438,21 @@ mask <- matrix(
 gss_miss[!mask] <- NA
 summary(gss_miss[,1:4]) # Now NAs are present
 #>                valorig                  valrich                   valeql   
-#>  Not like me at all: 21   Not like me at all:193   Not like me at all: 14  
-#>  Not like me       : 55   Not like me       :458   Not like me       : 17  
-#>  A little like me  :116   A little like me  :214   A little like me  : 43  
-#>  Somewhat like me  :318   Somewhat like me  :155   Somewhat like me  :143  
-#>  Like me           :294   Like me           : 67   Like me           :343  
-#>  Very much like me :320   Very much like me : 59   Very much like me :556  
-#>  NA's              :131   NA's              :109   NA's              :139  
+#>  Not like me at all: 19   Not like me at all:182   Not like me at all: 14  
+#>  Not like me       : 56   Not like me       :446   Not like me       : 20  
+#>  A little like me  :114   A little like me  :221   A little like me  : 47  
+#>  Somewhat like me  :309   Somewhat like me  :148   Somewhat like me  :142  
+#>  Like me           :292   Like me           : 70   Like me           :344  
+#>  Very much like me :323   Very much like me : 55   Very much like me :554  
+#>  NA's              :142   NA's              :133   NA's              :134  
 #>                valable   
-#>  Not like me at all: 48  
+#>  Not like me at all: 44  
 #>  Not like me       :185  
-#>  A little like me  :194  
-#>  Somewhat like me  :285  
-#>  Like me           :246  
-#>  Very much like me :176  
-#>  NA's              :121
+#>  A little like me  :196  
+#>  Somewhat like me  :275  
+#>  Like me           :241  
+#>  Very much like me :182  
+#>  NA's              :132
 ```
 
 Let’s rerun the estimation: the function works, though coefficients may
@@ -496,18 +486,17 @@ if (!require(microbenchmark)) {
   install.packages('microbenchmark')
   library(microbenchmark)
 }
-#> Loading required package: microbenchmark
 bm <- microbenchmark(
-  standard = polychoric(gss_num),
+  polychoric = polychoric(gss_num),
   cor_polychoric = cor_polychoric(gss12_values),
   times = 13L,
   control = list(warmup = 2)
 )
 bm
 #> Unit: milliseconds
-#>            expr       min        lq      mean    median       uq       max
-#>        standard 2414.9642 2447.3109 2483.9348 2474.7553 2499.473 2611.6328
-#>  cor_polychoric  177.1701  179.2412  181.8147  182.3574  183.254  186.2031
+#>            expr       min        lq      mean    median        uq       max
+#>      polychoric 2399.6845 2425.4384 2444.8269 2444.7262 2463.0100 2491.4847
+#>  cor_polychoric  181.4081  182.2151  183.2385  183.3385  183.9289  185.2803
 #>  neval cld
 #>     13  a 
 #>     13   b
@@ -530,33 +519,56 @@ The upcoming steps
 </summary>
 
 1.  Implement (optional) more robust distributional assumptions, e.g. a
-    skew normal distribution (*Jin and Yang-Wallentin 2017*).
-    </details>
+    skew normal distribution ((Jin and Yang-Wallentin 2016)).
 
-## References
+</details>
 
-1.  Drasgow, Fritz (1986). Polychoric and polyserial correlations. The
-    Encyclopedia of Statistics. 7. 68-74.
+<div id="refs" class="references csl-bib-body hanging-indent">
 
-2.  Revelle, William (2023). *psych: Procedures for Psychological,
-    Psychometric, and Personality Research*. Northwestern University,
-    Evanston, Illinois. R package version 2.3.3,
-    <https://CRAN.R-project.org/package=psych>.
+<div id="ref-donnelly1973" class="csl-entry">
 
-3.  Olsson, Ulf (1979). Maximum Likelihood Estimation of the Polychoric
-    Correlation Coefficient, Psychometrika, 44:443-460.
+Donnelly, Thomas G. 1973. “Algorithm 462: Bivariate Normal
+Distribution.” *Communications of the ACM* 16 (10): 638.
+<https://doi.org/10.1145/362375.362414>.
 
-4.  Donnelly, Thomas (1973). Algorithm 462: Bivariate Normal
-    Distribution, Communications of the ACM, October 1973, Volume 16,
-    Number 10, page 638.
+</div>
 
-5.  Owen, Donald (1956). Tables for Computing Bivariate Normal
-    Probabilities, Annals of Mathematical Statistics, December 1956,
-    Volume 27, Number 4, pages 1075-1090.
+<div id="ref-drasgow2004" class="csl-entry">
 
-6.  Qiu, Yixuan (2023). LBFGS++: A Header-only C++ Library for L-BFGS
-    and L-BFGS-B Algorithms. Available at: <https://lbfgspp.statr.me/>
+Drasgow, Fritz. 2004. “Polychoric and Polyserial Correlations,” October.
+<https://doi.org/10.1002/0471667196.ess2014>.
 
-7.  Jin S, Yang-Wallentin F (2017). Asymptotic Robustness Study of the
-    Polychoric Correlation Estimation. Psychometrika. 2017
-    Mar;82(1):67-85.
+</div>
+
+<div id="ref-jin2016" class="csl-entry">
+
+Jin, Shaobo, and Fan Yang-Wallentin. 2016. “Asymptotic Robustness Study
+of the Polychoric Correlation Estimation.” *Psychometrika* 82 (1):
+67–85. <https://doi.org/10.1007/s11336-016-9512-2>.
+
+</div>
+
+<div id="ref-owen1956" class="csl-entry">
+
+Owen, Donald B. 1956. “Tables for Computing Bivariate Normal
+Probabilities.” *The Annals of Mathematical Statistics* 27 (4): 1075–90.
+<https://doi.org/10.1214/aoms/1177728074>.
+
+</div>
+
+<div id="ref-LBFGSpp" class="csl-entry">
+
+Qiu, Yixuan. 2023. “LBFGS++: A Header-Only c++ Library for l-BFGS and
+l-BFGS-b Algorithms.”
+
+</div>
+
+<div id="ref-psych" class="csl-entry">
+
+Revelle, William. 2023. “Psych: Procedures for Psychological,
+Psychometric, and Personality Research.”
+<http://personality-project.org/r/psych/>.
+
+</div>
+
+</div>

@@ -1,5 +1,6 @@
 ---
 output: github_document
+bibliography: references.bib
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -12,20 +13,25 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%",
   cache = TRUE,
-  cache.extra = rand_seed
+  cache.extra = rand_seed,
+  warning = FALSE,
+  message = FALSE
 )
 ```
 
-# polychoric <img src="man/figures/logo.png" align="right" height="139" title="Created with hexSticker package" />
+# polychoric <img src="man/figures/logo.png" title="Logo created with hexSticker package" align="right" height="139"/>
 
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/Marwolaeth/polychoric/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Marwolaeth/polychoric/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
 Instant Polychoric and Polyserial Correlation
 
 ## About
-Polychoric is a package that provides a wrapper for C++ routines used to calculate polychoric and polyserial correlation coefficients, which are often used in social science or marketing research. The `cor_polychoric()` function can take in ordinal factor (possibly integer) vectors, a contingency table or a data frame. It returns corresponding polychoric correlation estimates in a form of single numeric value or correlation matrix. 
+
+Polychoric is a package that provides a wrapper for C++ routines used to calculate polychoric and polyserial correlation coefficients, which are often used in social science or marketing research. The `cor_polychoric()` function can take in ordinal factor (possibly integer) vectors, a contingency table or a data frame. It returns corresponding polychoric correlation estimates in a form of single numeric value or correlation matrix.
 
 The `cor_polyserial()` takes exactly one continuous and one ordinal vector and returns a polyserial coefficient estimate. Both functions optionally return the p-values associated with the coefficients and estimated discretization thresholds for ordinal variables.
 
@@ -37,17 +43,19 @@ You can install the development version of polychoric from [GitHub](https://gith
 # install.packages("devtools")
 # devtools::install_github("Marwolaeth/polychoric")
 ```
-  
+
 ## The Purpose
+
 Polychoric correlation coefficients are a type of correlation coefficient used to measure the relationship between two ordinal variables. They are computed by estimating the correlation between two underlying continuous variables that are assumed to give rise to the observed ordinal data. The `cor_polychoric()` function estimates latent Pearson correlation coefficients under the assumption that the latent traits of interest are standard normal random variables.
 
 Polyserial correlation is used to measure the relationship between a continuous variable and an ordinal variable. They are computed by estimating the correlation between the observed continuous variable and a latent continuous variable that is derived from the observed ordinal variable.
 
-The computation of both polychoric and polyserial correlation coefficients involves estimating the thresholds (here called `gamma` and `tau`, like in (*Drasgow 1986*), or just `tau` as in `psych` package (*Revelle 2023*)) that separate the ordinal categories for each variable. These thresholds are used to transform the ordinal data into a set of continuous variables, which can then be used to estimate the correlation coefficient using standard methods. The `cor_polychoric()` and `cor_polyserial()` functions currently estimate the coefficients using a two-step maximum likelihood estimation, where first the thresholds are deduced from univariate distributions of ordinal variable(s) and then the `L-BFGS-B` optimization algorithm (implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/), *Yixuan 2023*) is used to find the value of the correlation coefficient $\rho$ that maximizes the likelihood of the observed data. The `toms462` (*Donnelly 1973*, *Owen 1956*) [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html) is used to approximate the bivariate normal distribution (quadrant probabilities) of threshold values in `cor_polychoric()`.
+The computation of both polychoric and polyserial correlation coefficients involves estimating the thresholds (here called `gamma` and `tau`, like in ([@drasgow2004]), or just `tau` as in `psych` package ([@psych])) that separate the ordinal categories for each variable. These thresholds are used to transform the ordinal data into a set of continuous variables, which can then be used to estimate the correlation coefficient using standard methods. The `cor_polychoric()` and `cor_polyserial()` functions currently estimate the coefficients using a two-step maximum likelihood estimation, where first the thresholds are deduced from univariate distributions of ordinal variable(s) and then the `L-BFGS-B` optimization algorithm (implemented in [LBFGS++](https://github.com/yixuan/LBFGSpp/), [@LBFGSpp]) is used to find the value of the correlation coefficient $\rho$ that maximizes the likelihood of the observed data. The `toms462` ([@donnelly1973], [@owen1956]) [algorithm](https://people.sc.fsu.edu/~jburkardt/cpp_src/toms462/toms462.html) is used to approximate the bivariate normal distribution (quadrant probabilities) of threshold values in `cor_polychoric()`.
 
 Polychoric and polyserial correlation coefficients are useful for analyzing data that involve ordinal variables, such as Likert scales or survey responses. They provide a measure of the strength and direction of the relationship between two ordinal variables, which can be useful for understanding patterns in the data.
 
 ## Disclaimer
+
 Please note that the `polychoric` package was developed as a personal project and is not intended for professional or commercial use. While every effort has been made to ensure the accuracy and reliability of the package, it is provided 'as is' without any warranty or guarantee of suitability for any particular purpose. The package is intended primarily as a means of exploring the direct implementation of (not so) complex mathematical concepts, such as likelihood functions and derivatives, and as such may not be suitable for all use cases. However, it is hoped that others may find the package useful and informative. If you do choose to use the `polychoric` package, please do so with an understanding of its intended use as a personal project and with full awareness of any limitations or potential issues.
 
 ## Example
@@ -208,7 +216,7 @@ if (!require(microbenchmark)) {
   library(microbenchmark)
 }
 bm <- microbenchmark(
-  standard = polychoric(gss_num),
+  polychoric = polychoric(gss_num),
   cor_polychoric = cor_polychoric(gss12_values),
   times = 13L,
   control = list(warmup = 2)
@@ -219,27 +227,16 @@ bm
 Another minor advantage of the `polychoric` package is that its functions accept ordinal factor variables without need to convert them explicitly.
 
 ## Development
+
 This is an alpha version of the package. It is under development.
 
 Please report any issues you came up with on the [issues](https://github.com/Marwolaeth/polychoric/issues) page.
 
 <details>
-  <summary>The upcoming steps</summary>
-  
-  1. Implement (optional) more robust distributional assumptions, e.g. a skew normal distribution (*Jin and Yang-Wallentin 2017*).
- </details>
 
-## References
-1. Drasgow, Fritz (1986). Polychoric and polyserial correlations. The Encyclopedia of Statistics. 7. 68-74.
+<summary>The upcoming steps</summary>
 
-2. Revelle, William (2023). _psych: Procedures for Psychological, Psychometric, and Personality Research_. Northwestern University, Evanston, Illinois. R package version 2.3.3, <https://CRAN.R-project.org/package=psych>.
+1.  Implement (optional) more robust distributional assumptions, e.g. a skew normal distribution ([@jin2016]).
 
-3. Olsson, Ulf (1979). Maximum Likelihood Estimation of the Polychoric Correlation Coefficient, Psychometrika, 44:443-460.
+</details>
 
-4. Donnelly, Thomas (1973). Algorithm 462: Bivariate Normal Distribution, Communications of the ACM, October 1973, Volume 16, Number 10, page 638.
-
-5. Owen, Donald (1956). Tables for Computing Bivariate Normal Probabilities, Annals of Mathematical Statistics, December 1956, Volume 27, Number 4, pages 1075-1090.
-
-6. Qiu, Yixuan (2023). LBFGS++: A Header-only C++ Library for L-BFGS and L-BFGS-B Algorithms. Available at: https://lbfgspp.statr.me/
-
-7. Jin S, Yang-Wallentin F (2017). Asymptotic Robustness Study of the Polychoric Correlation Estimation. Psychometrika. 2017 Mar;82(1):67-85.
