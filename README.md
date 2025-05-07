@@ -11,6 +11,8 @@
 
 Instant Polychoric and Polyserial Correlation
 
+*Archived due to unexplained errors*
+
 ## About
 
 Polychoric is a package that provides a wrapper via (Bates and
