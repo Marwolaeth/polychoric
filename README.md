@@ -11,7 +11,7 @@
 
 Instant Polychoric and Polyserial Correlation
 
-*Archived due to unexplained errors*
+*Archived due to unexplained errors. Please use the latest (0.9.4) binary if you need*
 
 ## About
 
